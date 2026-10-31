@@ -1,27 +1,63 @@
 import { useState } from 'react'
 import { CATEGORIES, DM_PRODUCTS } from '../data/products'
 import { HeroBanner } from '../components/product/HeroBanner'
+import {
+  CatalogToolbar,
+  type SortOption,
+} from '../components/product/CatalogToolbar'
 import { ProductGrid } from '../components/product/ProductGrid'
+import { useDebounce } from '../hooks/useDebounce'
 
-// P2 — Catalog Page (/)
-// Displays the Velvety HeroBanner, centered editorial heading, category filter buttons, and ProductGrid.
+// P2 — Catalog Page (/) [CORE + FULL Search, Category Filter & Sorting]
 export function CatalogPage() {
-  // State for the currently selected category ('All', 'Skincare', 'Hair Care', or 'Body & Personal Care')
+  // 1. Filter & Sort State
   const [selectedCategory, setSelectedCategory] = useState<string>('All')
+  const [searchQuery, setSearchQuery] = useState<string>('')
+  const [sortBy, setSortChange] = useState<SortOption>('')
 
-  // Filter products based on the selected category
-  const filteredProducts =
-    selectedCategory === 'All'
-      ? DM_PRODUCTS
-      : DM_PRODUCTS.filter((product) => product.category === selectedCategory)
+  // 2. Debounce the search query by 400ms (PRD P2.4)
+  const debouncedSearch = useDebounce(searchQuery, 400)
+
+  // 3. Filter products by Category and Debounced Search text
+  const filteredProducts = DM_PRODUCTS.filter((product) => {
+    const matchesCategory =
+      selectedCategory === 'All' || product.category === selectedCategory
+
+    const query = debouncedSearch.trim().toLowerCase()
+    const matchesSearch =
+      query === '' ||
+      product.title.toLowerCase().includes(query) ||
+      product.description.toLowerCase().includes(query)
+
+    return matchesCategory && matchesSearch
+  })
+
+  // 4. Sort a copy of the filtered products array (PRD P2.6)
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    if (sortBy === 'price-asc') return a.price - b.price
+    if (sortBy === 'price-desc') return b.price - a.price
+    if (sortBy === 'rating-desc') return b.rating - a.rating
+    if (sortBy === 'title-asc') return a.title.localeCompare(b.title)
+    return 0
+  })
+
+  // Reset all filters when clicking "Clear filters" (PRD P2.3)
+  function handleClearFilters() {
+    setSelectedCategory('All')
+    setSearchQuery('')
+    setSortChange('')
+  }
 
   return (
     <section className="space-y-8">
       {/* Top Velvety Hero Banner */}
       <HeroBanner />
 
-      {/* Centered Editorial Section Heading (inspired by Velvety template) */}
-      <div id="catalog-products" className="text-center max-w-xl mx-auto space-y-2 pt-2">
+      {/* Centered Editorial Section Heading */}
+      <div
+        id="catalog-products"
+        className="text-center max-w-xl mx-auto space-y-2 pt-2"
+      >
         <p className="text-xs uppercase tracking-widest text-velvety-sage">
           Our featured products
         </p>
@@ -30,8 +66,8 @@ export function CatalogPage() {
         </h2>
       </div>
 
-      {/* Centered Category Filter Buttons */}
-      <div className="flex flex-wrap justify-center gap-2 border-b border-stone-200 pb-6">
+      {/* Category Filter Buttons */}
+      <div className="flex flex-wrap justify-center gap-2">
         {CATEGORIES.map((category) => {
           const isActive = selectedCategory === category
           return (
@@ -51,8 +87,30 @@ export function CatalogPage() {
         })}
       </div>
 
-      {/* Product Grid */}
-      <ProductGrid products={filteredProducts} />
+      {/* Search & Sort Toolbar */}
+      <CatalogToolbar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        sortBy={sortBy}
+        onSortChange={setSortChange}
+        resultCount={sortedProducts.length}
+      />
+
+      {/* Empty State or Product Grid (PRD P2.3) */}
+      {sortedProducts.length === 0 ? (
+        <div className="bg-white border border-stone-200 p-10 text-center space-y-3">
+          <p className="text-stone-600">No products found.</p>
+          <button
+            type="button"
+            onClick={handleClearFilters}
+            className="text-xs uppercase tracking-wider font-semibold text-velvety-green underline cursor-pointer"
+          >
+            Clear filters
+          </button>
+        </div>
+      ) : (
+        <ProductGrid products={sortedProducts} />
+      )}
     </section>
   )
 }
