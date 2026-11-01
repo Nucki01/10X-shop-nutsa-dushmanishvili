@@ -1,5 +1,12 @@
 // src/types/product.ts
-// TypeScript types for products coming from the DummyJSON API (CORE Step 3).
+// TypeScript types for products and customer reviews (CORE Step 3 & FULL P3.4).
+
+export interface Review {
+  rating: number
+  comment: string
+  date: string
+  reviewerName: string
+}
 
 export interface Product {
   id: number
@@ -13,6 +20,7 @@ export interface Product {
   stock: number
   thumbnail: string
   images: string[]
+  reviews?: Review[]
 }
 
 // Type for the API response when fetching a list of products (GET /products)
