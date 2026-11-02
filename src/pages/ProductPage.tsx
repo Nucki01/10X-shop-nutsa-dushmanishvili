@@ -1,12 +1,13 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { DM_PRODUCTS } from '../data/products'
+import { ProductReviews } from '../components/product/ProductReviews'
+import { RelatedProducts } from '../components/product/RelatedProducts'
 import { useCart } from '../context/CartContext'
+import { DM_PRODUCTS } from '../data/products'
 import { formatPrice } from '../utils/format'
 import { NotFoundPage } from './NotFoundPage'
 
-// P3 — Product Details Page (/products/:id) [CORE Steps 10 & 11]
-// Styled with Velvety @theme tokens (font-serif, bg-velvety-mist, bg-velvety-green).
+// P3 — Product Details Page (/products/:id) [CORE + FULL Reviews & Related Products]
 export function ProductPage() {
   const { id } = useParams<{ id: string }>()
   const { addItem } = useCart()
@@ -14,6 +15,13 @@ export function ProductPage() {
   // Local state for selected quantity and a confirmation message when added
   const [quantity, setQuantity] = useState(1)
   const [addedMessage, setAddedMessage] = useState(false)
+
+  // Reset quantity and confirmation message whenever the URL `:id` changes (PRD Section P3.2)
+  useEffect(() => {
+    setQuantity(1)
+    setAddedMessage(false)
+    window.scrollTo(0, 0)
+  }, [id])
 
   // Find the product with the matching ID from our dm products list
   const productId = Number(id)
@@ -42,7 +50,7 @@ export function ProductPage() {
   }
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-8">
       <Link
         to="/"
         className="inline-block text-xs uppercase tracking-wider font-medium text-velvety-sage hover:text-velvety-green"
@@ -50,9 +58,9 @@ export function ProductPage() {
         ← Back to catalog
       </Link>
 
-      {/* Two-column layout on desktop (md:grid-cols-2), single column on mobile */}
+      {/* Main Product Details Card */}
       <div className="bg-white border border-stone-200 p-6 sm:p-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-        {/* Left Column: Product Image inside soft sage-mist frame (object-contain prevents ugly cropping) */}
+        {/* Left Column: Product Image inside soft sage-mist frame */}
         <div className="bg-velvety-mist/60 p-6 flex items-center justify-center">
           <img
             src={product.thumbnail}
@@ -90,7 +98,7 @@ export function ProductPage() {
             {product.description}
           </p>
 
-          {/* Quantity Stepper (- / +) and Add to Cart Button (PRD Step 11) */}
+          {/* Quantity Stepper (- / +) and Add to Cart Button */}
           <div className="pt-4 border-t border-stone-200 flex flex-wrap items-center gap-4">
             <div className="flex items-center border border-stone-300 bg-velvety-cream">
               <button
@@ -122,7 +130,6 @@ export function ProductPage() {
             </button>
           </div>
 
-          {/* Simple feedback message after adding to cart */}
           {addedMessage && (
             <p className="text-sm text-velvety-green font-medium">
               Added to cart!{' '}
@@ -133,6 +140,12 @@ export function ProductPage() {
           )}
         </div>
       </div>
+
+      {/* Customer Reviews Section (key={product.id} resets state when switching products) */}
+      <ProductReviews key={product.id} productId={product.id} />
+
+      {/* Related Products Section */}
+      <RelatedProducts currentProduct={product} />
     </section>
   )
 }
