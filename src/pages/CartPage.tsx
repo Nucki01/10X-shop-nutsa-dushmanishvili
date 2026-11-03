@@ -1,13 +1,40 @@
+import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { formatPrice } from '../utils/format'
 
-// P4 — Shopping Cart Page (/cart) [CORE Step 13]
+// P4 — Shopping Cart Page (/cart) [CORE Step 13 + FULL Promo Code 10X10]
 // Styled with Velvety @theme tokens (font-serif, bg-velvety-mist, bg-velvety-green).
 export function CartPage() {
-  const { items, totalItems, totalPrice, updateQuantity, removeItem, clearCart } =
-    useCart()
+  const {
+    items,
+    totalItems,
+    totalPrice,
+    promoCode,
+    discountAmount,
+    finalPrice,
+    updateQuantity,
+    removeItem,
+    applyPromoCode,
+    removePromoCode,
+    clearCart,
+  } = useCart()
   const navigate = useNavigate()
+
+  // Local state for the promo code input box and validation message
+  const [promoInput, setPromoInput] = useState('')
+  const [promoError, setPromoError] = useState('')
+
+  function handleApplyPromo(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const isValid = applyPromoCode(promoInput)
+    if (isValid) {
+      setPromoError('')
+      setPromoInput('')
+    } else {
+      setPromoError('Invalid promo code')
+    }
+  }
 
   // 1. Empty Cart State (PRD P4.1)
   if (items.length === 0) {
@@ -125,11 +152,64 @@ export function CartPage() {
         <div className="bg-white border border-stone-200 p-6 h-fit space-y-4">
           <h2 className="font-serif text-xl text-velvety-ink">Order Summary</h2>
 
+          {/* Promo Code Form (PRD P4.4 — code "10X10" gives 10% off) */}
+          {!promoCode ? (
+            <form onSubmit={handleApplyPromo} className="space-y-1.5">
+              <label
+                htmlFor="promo-code"
+                className="block text-xs uppercase tracking-wider text-stone-500"
+              >
+                Promo code (try 10X10)
+              </label>
+              <div className="flex gap-2">
+                <input
+                  id="promo-code"
+                  type="text"
+                  value={promoInput}
+                  onChange={(e) => {
+                    setPromoInput(e.target.value)
+                    if (promoError) setPromoError('')
+                  }}
+                  placeholder="Enter code"
+                  className="flex-1 border border-stone-300 bg-velvety-cream/50 px-3 py-2 text-sm focus:outline-2 focus:outline-velvety-green"
+                />
+                <button
+                  type="submit"
+                  className="bg-velvety-ink hover:bg-velvety-green text-white text-xs uppercase tracking-wider font-medium px-4 py-2 cursor-pointer transition-colors"
+                >
+                  Apply
+                </button>
+              </div>
+              {promoError && (
+                <p className="text-xs text-red-600">{promoError}</p>
+              )}
+            </form>
+          ) : (
+            <div className="flex items-center justify-between bg-velvety-mist/70 border border-stone-200 px-3 py-2 text-xs">
+              <span className="font-medium text-velvety-green">
+                Code <strong>{promoCode}</strong> applied (−10%)
+              </span>
+              <button
+                type="button"
+                onClick={removePromoCode}
+                className="uppercase tracking-wider text-red-700 hover:underline cursor-pointer"
+              >
+                Remove
+              </button>
+            </div>
+          )}
+
           <div className="space-y-2 text-sm border-b border-stone-200 pb-4">
             <div className="flex justify-between text-stone-600">
-              <span>Items ({totalItems})</span>
+              <span>Subtotal ({totalItems} items)</span>
               <span>{formatPrice(totalPrice)}</span>
             </div>
+            {promoCode && (
+              <div className="flex justify-between text-velvety-green font-medium">
+                <span>Discount ({promoCode} −10%)</span>
+                <span>−{formatPrice(discountAmount)}</span>
+              </div>
+            )}
             <div className="flex justify-between text-stone-600">
               <span>Shipping</span>
               <span>Free</span>
@@ -139,7 +219,7 @@ export function CartPage() {
           <div className="flex justify-between text-base font-bold text-velvety-ink">
             <span>Total</span>
             <span className="font-serif text-xl text-velvety-green">
-              {formatPrice(totalPrice)}
+              {formatPrice(finalPrice)}
             </span>
           </div>
 
