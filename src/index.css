@@ -4,6 +4,11 @@
 @import "tailwindcss";
 
 /* 
+  Tailwind CSS v4 class-based Dark Mode variant (PRD FULL Tailwind CSS requirement)
+*/
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* 
   Custom Design Tokens using Tailwind v4 @theme (PRD FULL Requirement TW5)
   Matches the "Velvety — Beauty & Wellness Website UI Kit" Figma palette:
   - Deep botanical forest/sage green, soft sage mist, and warm cream background.
@@ -19,11 +24,51 @@
   --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
 }
 
+/* 
+  Dark Mode Token & Surface Adaptation when <html class="dark"> is active
+*/
+html.dark {
+  --color-velvety-cream: #121814;
+  --color-velvety-ink: #edf1ec;
+  --color-velvety-mist: #243127;
+  color-scheme: dark;
+}
+
+html.dark .bg-white {
+  background-color: #1b241d;
+}
+
+html.dark .border-stone-200,
+html.dark .border-stone-200\/80,
+html.dark .border-stone-200\/70,
+html.dark .border-stone-300 {
+  border-color: #2f3e33;
+}
+
+html.dark .text-stone-600,
+html.dark .text-stone-700,
+html.dark .text-stone-500 {
+  color: #b7c4ba;
+}
+
+html.dark .text-velvety-green {
+  color: #9ec4a5;
+}
+
+html.dark input,
+html.dark select,
+html.dark textarea {
+  background-color: #141b16;
+  color: #edf1ec;
+  border-color: #354639;
+}
+
 body {
   font-family: var(--font-sans);
   background-color: var(--color-velvety-cream);
   color: var(--color-velvety-ink);
   font-variant-numeric: lining-nums;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* Ensure Playfair Display numbers ("10" in 10X Shop and prices) match capital letter height */
