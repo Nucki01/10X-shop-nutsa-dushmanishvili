@@ -4,22 +4,22 @@ export function HeroBanner() {
   return (
     <div className="rounded-xs overflow-hidden border border-stone-200 bg-white mb-10">
       {/* Top Banner: Sage green split layout */}
-      <div className="bg-velvety-sage text-white p-8 sm:p-12 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div className="bg-velvety-sage dark:bg-[#1f2e23] text-white p-8 sm:p-12 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
         <div className="space-y-4">
-          <p className="text-xs uppercase tracking-widest text-velvety-mist">
+          <p className="text-xs uppercase tracking-widest text-white/80">
             100% Vegan &amp; Cruelty-Free · Beauty &amp; Wellness Collection
           </p>
           <h1 className="font-serif text-3xl sm:text-5xl leading-tight">
             Let nature take care of your body and soul
           </h1>
-          <p className="text-sm text-velvety-mist/90 max-w-md leading-relaxed">
+          <p className="text-sm text-white/90 max-w-md leading-relaxed">
             Discover gentle skincare, clean beauty, and botanical fragrances
             crafted for healthy, radiant skin.
           </p>
           <div className="pt-2">
             <a
               href="#catalog-products"
-              className="inline-block bg-white text-velvety-green hover:bg-velvety-mist px-6 py-3 text-xs font-semibold uppercase tracking-wider transition-colors"
+              className="inline-block bg-[#f6f5f0] text-[#2f4333] hover:bg-[#e9ede8] px-6 py-3 text-xs font-semibold uppercase tracking-wider transition-colors"
             >
               Shop now →
             </a>

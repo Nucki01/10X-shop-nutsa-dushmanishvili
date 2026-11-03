@@ -3,10 +3,10 @@ import { Header } from './Header'
 import { Footer } from './Footer'
 import { Container } from '../ui/Container'
 
-// Shared Layout Component (styled with Velvety cream background and ink text)
+// Shared Layout Component (supports both Light and Dark Velvety themes)
 export function Layout() {
   return (
-    <div className="min-h-screen bg-velvety-cream text-velvety-ink flex flex-col">
+    <div className="min-h-screen bg-velvety-cream dark:bg-[#121814] text-velvety-ink dark:text-[#edf1ec] flex flex-col transition-colors">
       <Header />
       <main className="flex-1 py-8">
         <Container>
