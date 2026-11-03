@@ -4,38 +4,40 @@ import type { Review } from '../../types/product'
 
 interface ProductReviewsProps {
   productId: number
+  apiReviews?: Review[]
 }
 
-// Default sample review shown for every vegan dm product
-const DEFAULT_REVIEWS: Review[] = [
-  {
-    rating: 5,
-    comment: 'Gentle vegan formula and smells wonderful. Will definitely buy again!',
-    date: '2026-10-15',
-    reviewerName: 'Nino K.',
-  },
-]
-
 // Helper to load saved reviews for a specific productId from localStorage (shop_reviews)
-function loadProductReviews(productId: number): Review[] {
+function loadProductReviews(
+  productId: number,
+  apiReviews: Review[] = []
+): Review[] {
+  const formattedApiReviews = apiReviews.map((rev) => ({
+    ...rev,
+    date: rev.date ? rev.date.split('T')[0] : '2026-10-15',
+  }))
+
   try {
     const raw = localStorage.getItem('shop_reviews')
-    if (!raw) return DEFAULT_REVIEWS
+    if (!raw) return formattedApiReviews
     const allReviews = JSON.parse(raw) as Record<number, Review[]>
     const saved = allReviews[productId] || []
-    return [...saved, ...DEFAULT_REVIEWS]
+    return [...saved, ...formattedApiReviews]
   } catch {
-    return DEFAULT_REVIEWS
+    return formattedApiReviews
   }
 }
 
 // ProductReviews Component (PRD FULL Requirement P3.4)
-// Displays customer reviews and a controlled form to add a new review.
-export function ProductReviews({ productId }: ProductReviewsProps) {
+// Displays customer reviews (from DummyJSON + localStorage) and a controlled form to add a new review.
+export function ProductReviews({
+  productId,
+  apiReviews = [],
+}: ProductReviewsProps) {
   const { user } = useAuth()
 
   const [reviews, setReviews] = useState<Review[]>(() =>
-    loadProductReviews(productId)
+    loadProductReviews(productId, apiReviews)
   )
   const [rating, setRating] = useState<number>(5)
   const [comment, setComment] = useState<string>('')
@@ -149,7 +151,7 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
             rows={3}
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            placeholder="Share your experience with this vegan product (at least 10 characters)..."
+            placeholder="Share your experience with this product (at least 10 characters)..."
             className="w-full border border-stone-300 bg-velvety-cream/50 px-3.5 py-2 text-sm focus:outline-2 focus:outline-velvety-green"
           />
           {commentError && (

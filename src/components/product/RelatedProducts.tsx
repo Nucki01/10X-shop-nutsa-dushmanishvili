@@ -1,5 +1,6 @@
-import { DM_PRODUCTS } from '../../data/products'
+import { useEffect, useState } from 'react'
 import type { Product } from '../../types/product'
+import { fetchProductsByCategory } from '../../utils/api'
 import { ProductGrid } from './ProductGrid'
 
 interface RelatedProductsProps {
@@ -7,13 +8,25 @@ interface RelatedProductsProps {
 }
 
 // RelatedProducts Component (PRD FULL Requirement P3.5)
-// Finds other products from the same category and renders them using the same ProductGrid/ProductCard.
+// Fetches other products from the same DummyJSON category and renders them using ProductGrid.
 export function RelatedProducts({ currentProduct }: RelatedProductsProps) {
-  const related = DM_PRODUCTS.filter(
-    (item) =>
-      item.category === currentProduct.category &&
-      item.id !== currentProduct.id
-  ).slice(0, 4)
+  const [related, setRelated] = useState<Product[]>([])
+
+  useEffect(() => {
+    async function loadRelated() {
+      try {
+        const data = await fetchProductsByCategory(currentProduct.category)
+        const filtered = data
+          .filter((item) => item.id !== currentProduct.id)
+          .slice(0, 4)
+        setRelated(filtered)
+      } catch {
+        setRelated([])
+      }
+    }
+
+    loadRelated()
+  }, [currentProduct.id, currentProduct.category])
 
   if (related.length === 0) {
     return null

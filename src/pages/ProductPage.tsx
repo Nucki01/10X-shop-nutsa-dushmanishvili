@@ -3,33 +3,88 @@ import { Link, useParams } from 'react-router-dom'
 import { ProductReviews } from '../components/product/ProductReviews'
 import { RelatedProducts } from '../components/product/RelatedProducts'
 import { useCart } from '../context/CartContext'
-import { DM_PRODUCTS } from '../data/products'
+import type { Product } from '../types/product'
+import { fetchProductById } from '../utils/api'
 import { formatPrice } from '../utils/format'
 import { NotFoundPage } from './NotFoundPage'
 
-// P3 — Product Details Page (/products/:id) [CORE + FULL Reviews & Related Products]
+// P3 — Product Details Page (/products/:id) [CORE + FULL Reviews & Related Products via DummyJSON API]
 export function ProductPage() {
   const { id } = useParams<{ id: string }>()
   const { addItem } = useCart()
+
+  // API state for single product
+  const [product, setProduct] = useState<Product | null>(null)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
+  const [notFound, setNotFound] = useState<boolean>(false)
 
   // Local state for selected quantity and a confirmation message when added
   const [quantity, setQuantity] = useState(1)
   const [addedMessage, setAddedMessage] = useState(false)
 
-  // Reset quantity and confirmation message whenever the URL `:id` changes (PRD Section P3.2)
+  // Fetch product by ID from DummyJSON whenever URL `:id` changes (PRD Section P3.2)
   useEffect(() => {
     setQuantity(1)
     setAddedMessage(false)
     window.scrollTo(0, 0)
+
+    const numericId = Number(id)
+    if (!id || Number.isNaN(numericId) || numericId <= 0) {
+      setNotFound(true)
+      setLoading(false)
+      return
+    }
+
+    async function loadProduct() {
+      setLoading(true)
+      setError(null)
+      setNotFound(false)
+      try {
+        const data = await fetchProductById(numericId)
+        if (!data) {
+          setNotFound(true)
+        } else {
+          setProduct(data)
+        }
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : 'Failed to load product details.'
+        )
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadProduct()
   }, [id])
 
-  // Find the product with the matching ID from our dm products list
-  const productId = Number(id)
-  const product = DM_PRODUCTS.find((item) => item.id === productId)
+  if (loading) {
+    return (
+      <div className="bg-white border border-stone-200 p-10 text-center">
+        <p className="text-stone-600">Loading product details...</p>
+      </div>
+    )
+  }
 
-  // If the ID is invalid (e.g. /products/999 or /products/abc), show the 404 page
-  if (!product) {
+  if (notFound) {
     return <NotFoundPage />
+  }
+
+  if (error || !product) {
+    return (
+      <div className="bg-white border border-stone-200 p-10 text-center space-y-4">
+        <p className="text-red-600">{error || 'Product not found.'}</p>
+        <Link
+          to="/"
+          className="inline-block bg-velvety-green text-white text-xs uppercase tracking-wider font-medium px-6 py-2.5"
+        >
+          Back to catalog
+        </Link>
+      </div>
+    )
   }
 
   // Determine stock badge text and color (PRD Section P3.3)
@@ -63,7 +118,7 @@ export function ProductPage() {
         {/* Left Column: Product Image inside soft sage-mist frame */}
         <div className="bg-velvety-mist/60 p-6 flex items-center justify-center">
           <img
-            src={product.thumbnail}
+            src={product.images?.[0] || product.thumbnail}
             alt={product.title}
             className="w-full max-w-xs sm:max-w-sm max-h-80 object-contain bg-white p-2"
           />
@@ -141,10 +196,14 @@ export function ProductPage() {
         </div>
       </div>
 
-      {/* Customer Reviews Section (key={product.id} resets state when switching products) */}
-      <ProductReviews key={product.id} productId={product.id} />
+      {/* Customer Reviews Section (combines DummyJSON API reviews + user localStorage reviews) */}
+      <ProductReviews
+        key={product.id}
+        productId={product.id}
+        apiReviews={product.reviews}
+      />
 
-      {/* Related Products Section */}
+      {/* Related Products Section (fetched from DummyJSON by category) */}
       <RelatedProducts currentProduct={product} />
     </section>
   )
