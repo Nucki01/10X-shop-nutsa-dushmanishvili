@@ -13,7 +13,15 @@ import { formatPrice } from '../utils/format'
 // Styled with Velvety @theme tokens (font-serif, bg-velvety-green).
 export function CheckoutPage() {
   const { user } = useAuth()
-  const { items, totalItems, totalPrice, clearCart } = useCart()
+  const {
+    items,
+    totalItems,
+    totalPrice,
+    promoCode,
+    discountAmount,
+    finalPrice,
+    clearCart,
+  } = useCart()
 
   // 1. Controlled Form State for the 4 required fields
   const [fullName, setFullName] = useState(user.username || '')
@@ -65,9 +73,9 @@ export function CheckoutPage() {
       return
     }
 
-    // Valid order: save total for confirmation screen and empty the cart
+    // Valid order: save final discounted total for confirmation screen and empty the cart
     setErrors({})
-    setPlacedOrderTotal(totalPrice)
+    setPlacedOrderTotal(finalPrice)
     clearCart()
   }
 
@@ -196,15 +204,29 @@ export function CheckoutPage() {
             ))}
           </ul>
 
-          <div className="flex justify-between text-sm text-stone-600">
-            <span>Total items</span>
-            <span>{totalItems}</span>
+          <div className="space-y-1.5 text-sm text-stone-600">
+            <div className="flex justify-between">
+              <span>Total items</span>
+              <span>{totalItems}</span>
+            </div>
+            {promoCode && (
+              <>
+                <div className="flex justify-between">
+                  <span>Subtotal</span>
+                  <span>{formatPrice(totalPrice)}</span>
+                </div>
+                <div className="flex justify-between text-velvety-green font-medium">
+                  <span>Discount ({promoCode} −10%)</span>
+                  <span>−{formatPrice(discountAmount)}</span>
+                </div>
+              </>
+            )}
           </div>
 
           <div className="flex justify-between text-base font-bold text-velvety-ink">
             <span>Total</span>
             <span className="font-serif text-xl text-velvety-green">
-              {formatPrice(totalPrice)}
+              {formatPrice(finalPrice)}
             </span>
           </div>
         </div>
