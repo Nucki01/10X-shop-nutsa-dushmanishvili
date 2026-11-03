@@ -10,7 +10,7 @@ interface ErrorBoundaryState {
 }
 
 // ErrorBoundary Component (PRD Requirement O2 & P0.6)
-// Note for Defense: In React, an Error Boundary must be a class component that implements
+// In React, an Error Boundary must be a class component that implements
 // `static getDerivedStateFromError` and `componentDidCatch`.
 // If any child component throws an unexpected error during rendering, this component catches it
 // and displays "Something went wrong." + a "Reload" button instead of a blank white screen.
