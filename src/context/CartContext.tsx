@@ -2,14 +2,19 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import type { CartItem } from '../types/cart'
 import type { Product } from '../types/product'
 
-// What CartContext shares with the rest of the app (CORE Step 12)
+// What CartContext shares with the rest of the app (CORE Step 12 + FULL Promo Code)
 interface CartContextType {
   items: CartItem[]
   totalItems: number
   totalPrice: number
+  promoCode: string | null
+  discountAmount: number
+  finalPrice: number
   addItem: (product: Product, quantity?: number) => void
   removeItem: (productId: number) => void
   updateQuantity: (productId: number, quantity: number) => void
+  applyPromoCode: (code: string) => boolean
+  removePromoCode: () => void
   clearCart: () => void
 }
 
@@ -30,6 +35,7 @@ function loadInitialCart(): CartItem[] {
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>(loadInitialCart)
+  const [promoCode, setPromoCode] = useState<string | null>(null)
 
   // Save cart items to localStorage whenever `items` changes
   useEffect(() => {
@@ -86,17 +92,34 @@ export function CartProvider({ children }: { children: ReactNode }) {
     )
   }
 
-  // 4. Empty the entire cart (used on Cart page and after Checkout)
-  function clearCart() {
-    setItems([])
+  // 4. Apply promo code "10X10" (case-insensitive) for a 10% discount [FULL]
+  function applyPromoCode(code: string): boolean {
+    if (code.trim().toUpperCase() === '10X10') {
+      setPromoCode('10X10')
+      return true
+    }
+    return false
   }
 
-  // Calculate total number of items (for Header badge) and total price in Euros
+  // 5. Remove applied promo code
+  function removePromoCode() {
+    setPromoCode(null)
+  }
+
+  // 6. Empty the entire cart (used on Cart page and after Checkout)
+  function clearCart() {
+    setItems([])
+    setPromoCode(null)
+  }
+
+  // Calculate total number of items (for Header badge), subtotal, discount, and final price
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
   const totalPrice = items.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   )
+  const discountAmount = promoCode === '10X10' ? totalPrice * 0.1 : 0
+  const finalPrice = totalPrice - discountAmount
 
   return (
     <CartContext.Provider
@@ -104,9 +127,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
         items,
         totalItems,
         totalPrice,
+        promoCode,
+        discountAmount,
+        finalPrice,
         addItem,
         removeItem,
         updateQuantity,
+        applyPromoCode,
+        removePromoCode,
         clearCart,
       }}
     >
