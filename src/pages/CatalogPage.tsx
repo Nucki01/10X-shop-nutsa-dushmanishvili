@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { CATEGORIES, DM_PRODUCTS } from '../data/products'
+import { useEffect, useState } from 'react'
 import { HeroBanner } from '../components/product/HeroBanner'
 import {
   CatalogToolbar,
@@ -7,19 +6,46 @@ import {
 } from '../components/product/CatalogToolbar'
 import { ProductGrid } from '../components/product/ProductGrid'
 import { useDebounce } from '../hooks/useDebounce'
+import type { Product } from '../types/product'
+import { BEAUTY_CATEGORIES, fetchCatalogProducts } from '../utils/api'
 
-// P2 — Catalog Page (/) [CORE + FULL Search, Category Filter & Sorting]
+// P2 — Catalog Page (/) [CORE + FULL Search, Category Filter & Sorting with DummyJSON API]
 export function CatalogPage() {
-  // 1. Filter & Sort State
+  // 1. API Data, Loading & Error State (PRD Requirement A1.6 & P2.1)
+  const [products, setProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // 2. Filter & Sort State
   const [selectedCategory, setSelectedCategory] = useState<string>('All')
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [sortBy, setSortChange] = useState<SortOption>('')
 
-  // 2. Debounce the search query by 400ms (PRD P2.4)
+  // 3. Debounce the search query by 400ms (PRD P2.4)
   const debouncedSearch = useDebounce(searchQuery, 400)
 
-  // 3. Filter products by Category and Debounced Search text
-  const filteredProducts = DM_PRODUCTS.filter((product) => {
+  // 4. Load beauty, skin-care, and fragrance products from DummyJSON API
+  async function loadProducts() {
+    setLoading(true)
+    setError(null)
+    try {
+      const data = await fetchCatalogProducts()
+      setProducts(data)
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'Something went wrong loading products.'
+      )
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadProducts()
+  }, [])
+
+  // 5. Filter products by Category and Debounced Search text
+  const filteredProducts = products.filter((product) => {
     const matchesCategory =
       selectedCategory === 'All' || product.category === selectedCategory
 
@@ -32,7 +58,7 @@ export function CatalogPage() {
     return matchesCategory && matchesSearch
   })
 
-  // 4. Sort a copy of the filtered products array (PRD P2.6)
+  // 6. Sort a copy of the filtered products array (PRD P2.6)
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     if (sortBy === 'price-asc') return a.price - b.price
     if (sortBy === 'price-desc') return b.price - a.price
@@ -66,22 +92,22 @@ export function CatalogPage() {
         </h2>
       </div>
 
-      {/* Category Filter Buttons */}
+      {/* Category Filter Buttons (from DummyJSON Beauty & Wellness categories) */}
       <div className="flex flex-wrap justify-center gap-2">
-        {CATEGORIES.map((category) => {
-          const isActive = selectedCategory === category
+        {BEAUTY_CATEGORIES.map((category) => {
+          const isActive = selectedCategory === category.slug
           return (
             <button
-              key={category}
+              key={category.slug}
               type="button"
-              onClick={() => setSelectedCategory(category)}
+              onClick={() => setSelectedCategory(category.slug)}
               className={`px-5 py-2 text-xs uppercase tracking-wider font-medium cursor-pointer transition-colors ${
                 isActive
                   ? 'bg-velvety-green text-white'
                   : 'bg-white border border-stone-200 text-velvety-ink hover:bg-velvety-mist'
               }`}
             >
-              {category}
+              {category.label}
             </button>
           )
         })}
@@ -96,8 +122,23 @@ export function CatalogPage() {
         resultCount={sortedProducts.length}
       />
 
-      {/* Empty State or Product Grid (PRD P2.3) */}
-      {sortedProducts.length === 0 ? (
+      {/* Loading State, Error State, Empty State, or Product Grid */}
+      {loading ? (
+        <div className="bg-white border border-stone-200 p-10 text-center">
+          <p className="text-stone-600">Loading products...</p>
+        </div>
+      ) : error ? (
+        <div className="bg-white border border-stone-200 p-10 text-center space-y-4">
+          <p className="text-red-600">{error}</p>
+          <button
+            type="button"
+            onClick={loadProducts}
+            className="bg-velvety-green hover:bg-velvety-sage text-white text-xs uppercase tracking-wider font-medium px-6 py-2.5 cursor-pointer transition-colors"
+          >
+            Try again
+          </button>
+        </div>
+      ) : sortedProducts.length === 0 ? (
         <div className="bg-white border border-stone-200 p-10 text-center space-y-3">
           <p className="text-stone-600">No products found.</p>
           <button

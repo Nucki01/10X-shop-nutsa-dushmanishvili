@@ -7,14 +7,14 @@ export function HeroBanner() {
       <div className="bg-velvety-sage text-white p-8 sm:p-12 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
         <div className="space-y-4">
           <p className="text-xs uppercase tracking-widest text-velvety-mist">
-            100% Vegan &amp; Cruelty-Free · dm Collection
+            100% Vegan &amp; Cruelty-Free · Beauty &amp; Wellness Collection
           </p>
           <h1 className="font-serif text-3xl sm:text-5xl leading-tight">
             Let nature take care of your body and soul
           </h1>
           <p className="text-sm text-velvety-mist/90 max-w-md leading-relaxed">
-            Discover gentle vegan skincare, plant-based hair care, and cruelty-free
-            body essentials crafted for healthy, radiant skin.
+            Discover gentle skincare, clean beauty, and botanical fragrances
+            crafted for healthy, radiant skin.
           </p>
           <div className="pt-2">
             <a
