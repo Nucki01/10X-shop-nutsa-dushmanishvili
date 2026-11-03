@@ -16,7 +16,7 @@ export function ProductCard({ product }: ProductCardProps) {
     <div className="bg-white border border-stone-200/80 p-4 flex flex-col justify-between transition-shadow hover:shadow-md">
       {/* Clicking the image or title opens the Product Details page (/products/:id) */}
       <Link to={`/products/${product.id}`} className="block space-y-3">
-        {/* Soft sage-mist image frame */}
+        {/* Soft sage-mist image frame — aspect-square keeps identical proportions on mobile, tablet & desktop */}
         <div className="bg-velvety-mist/60 p-3">
           <img
             src={product.thumbnail}
@@ -24,7 +24,7 @@ export function ProductCard({ product }: ProductCardProps) {
             loading="lazy"
             width={300}
             height={300}
-            className="w-full h-52 object-cover bg-white"
+            className="w-full aspect-square object-cover bg-white"
           />
         </div>
 

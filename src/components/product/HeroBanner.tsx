@@ -26,12 +26,12 @@ export function HeroBanner() {
           </div>
         </div>
 
-        {/* Featured Botanical Skincare Visual (wide landscape photo that fits without cropping bottles) */}
+        {/* Featured Botanical Skincare Visual (aspect-[4/3] keeps constant proportions across all screen sizes) */}
         <div className="flex justify-center">
           <img
             src="https://images.unsplash.com/photo-1612817288484-6f916006741a?auto=format&fit=crop&w=900&q=80"
             alt="Natural vegan skincare bottles and botanicals"
-            className="w-full max-w-md h-64 sm:h-72 object-cover object-center rounded-xs border border-white/20"
+            className="w-full max-w-md aspect-[4/3] object-cover object-center rounded-xs border border-white/20"
           />
         </div>
       </div>
