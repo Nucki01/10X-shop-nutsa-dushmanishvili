@@ -51,8 +51,9 @@ html.dark .text-stone-500 {
   color: #b7c4ba;
 }
 
-html.dark .text-velvety-green {
-  color: #9ec4a5;
+html.dark .text-velvety-green,
+html.dark .text-velvety-sage {
+  color: #b7e2c0;
 }
 
 html.dark input,
