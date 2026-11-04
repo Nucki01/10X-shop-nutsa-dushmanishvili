@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
-import { formatPrice } from '../utils/format'
+import { discountedPrice, formatPrice } from '../utils/format'
 
 // P4 — Shopping Cart Page (/cart) [CORE Step 13 + FULL Promo Code 10X10]
 // Styled with Velvety @theme tokens (font-serif, bg-velvety-mist, bg-velvety-green).
@@ -63,7 +63,11 @@ export function CartPage() {
         </h1>
         <button
           type="button"
-          onClick={clearCart}
+          onClick={() => {
+            if (window.confirm('Clear the cart? This cannot be undone.')) {
+              clearCart()
+            }
+          }}
           className="text-xs uppercase tracking-wider text-red-700 hover:underline cursor-pointer"
         >
           Clear cart
@@ -74,7 +78,11 @@ export function CartPage() {
         {/* Left Side: List of Cart Items (takes 2 columns on desktop) */}
         <div className="lg:col-span-2 space-y-4">
           {items.map((item) => {
-            const lineTotal = item.price * item.quantity
+            const unitPrice = discountedPrice(
+              item.price,
+              item.discountPercentage
+            )
+            const lineTotal = unitPrice * item.quantity
 
             return (
               <div
@@ -98,7 +106,7 @@ export function CartPage() {
                       {item.title}
                     </Link>
                     <p className="text-xs text-stone-500 mt-1">
-                      Unit price: {formatPrice(item.price)}
+                      Unit price: {formatPrice(unitPrice)}
                     </p>
                   </div>
                 </div>

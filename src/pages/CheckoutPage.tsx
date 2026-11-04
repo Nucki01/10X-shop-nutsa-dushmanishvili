@@ -7,7 +7,7 @@ import {
   validateCheckoutForm,
   type CheckoutErrors,
 } from '../utils/checkoutValidation'
-import { formatPrice } from '../utils/format'
+import { discountedPrice, formatPrice } from '../utils/format'
 
 // P5 — Checkout Page (/checkout) [CORE Steps 14 & 15]
 // Styled with Velvety @theme tokens (font-serif, bg-velvety-green).
@@ -198,7 +198,10 @@ export function CheckoutPage() {
                   {item.title} × {item.quantity}
                 </span>
                 <span className="font-medium text-velvety-ink shrink-0">
-                  {formatPrice(item.price * item.quantity)}
+                  {formatPrice(
+                    discountedPrice(item.price, item.discountPercentage) *
+                      item.quantity
+                  )}
                 </span>
               </li>
             ))}

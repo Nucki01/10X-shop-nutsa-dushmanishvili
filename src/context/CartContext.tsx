@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { CartItem } from '../types/cart'
 import type { Product } from '../types/product'
+import { discountedPrice } from '../utils/format'
 
 // What CartContext shares with the rest of the app (CORE Step 12 + FULL Promo Code)
 interface CartContextType {
@@ -115,7 +116,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Calculate total number of items (for Header badge), subtotal, discount, and final price
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
   const totalPrice = items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (sum, item) =>
+      sum + discountedPrice(item.price, item.discountPercentage) * item.quantity,
     0
   )
   const discountAmount = promoCode === '10X10' ? totalPrice * 0.1 : 0
