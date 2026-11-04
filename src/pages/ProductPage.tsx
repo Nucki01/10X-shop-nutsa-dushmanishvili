@@ -5,7 +5,7 @@ import { RelatedProducts } from '../components/product/RelatedProducts'
 import { useCart } from '../context/CartContext'
 import type { Product } from '../types/product'
 import { fetchProductById } from '../utils/api'
-import { formatPrice } from '../utils/format'
+import { discountedPrice, formatPrice } from '../utils/format'
 import { NotFoundPage } from './NotFoundPage'
 
 // P3 — Product Details Page (/products/:id) [CORE + FULL Reviews & Related Products via DummyJSON API]
@@ -140,10 +140,22 @@ export function ProductPage() {
             {product.title}
           </h1>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <span className="font-serif text-2xl font-bold text-velvety-green">
-              {formatPrice(product.price)}
+              {formatPrice(
+                discountedPrice(product.price, product.discountPercentage)
+              )}
             </span>
+            {product.discountPercentage >= 1 && (
+              <>
+                <span className="text-sm text-stone-400 line-through">
+                  {formatPrice(product.price)}
+                </span>
+                <span className="bg-velvety-green text-white text-xs font-semibold px-2 py-0.5">
+                  −{Math.round(product.discountPercentage)}%
+                </span>
+              </>
+            )}
             <span className={`text-xs font-medium px-2.5 py-1 ${stockColor}`}>
               {stockText}
             </span>

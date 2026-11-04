@@ -1,23 +1,33 @@
 import { Link } from 'react-router-dom'
 import type { Product } from '../../types/product'
 import { useCart } from '../../context/CartContext'
-import { formatPrice } from '../../utils/format'
+import { discountedPrice, formatPrice } from '../../utils/format'
 
 // Props for ProductCard
 interface ProductCardProps {
   product: Product
 }
 
-// Reusable ProductCard Component (styled in Velvety Beauty & Wellness style)
+// Reusable ProductCard Component (PRD P2.3 — shows thumbnail, brand, category, rating, discounted price, stock, Add to cart)
 export function ProductCard({ product }: ProductCardProps) {
   const { addItem } = useCart()
+  const hasDiscount = product.discountPercentage >= 1
+  const finalUnitPrice = discountedPrice(
+    product.price,
+    product.discountPercentage
+  )
 
   return (
     <div className="bg-white border border-stone-200/80 p-4 flex flex-col justify-between transition-shadow hover:shadow-md">
       {/* Clicking the image or title opens the Product Details page (/products/:id) */}
       <Link to={`/products/${product.id}`} className="block space-y-3">
         {/* Soft sage-mist image frame — aspect-square keeps identical proportions on mobile, tablet & desktop */}
-        <div className="bg-velvety-mist/60 p-3">
+        <div className="relative bg-velvety-mist/60 p-3">
+          {hasDiscount && (
+            <span className="absolute top-5 left-5 bg-velvety-green text-white text-[11px] font-semibold px-2 py-0.5">
+              −{Math.round(product.discountPercentage)}%
+            </span>
+          )}
           <img
             src={product.thumbnail}
             alt={product.title}
@@ -52,11 +62,18 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       </Link>
 
-      {/* Price in Euros (€) and Add to cart button */}
+      {/* Price in Euros (€) with optional discount and Add to cart button */}
       <div className="mt-4 pt-3 border-t border-stone-200/70 flex items-center justify-between gap-2">
-        <span className="font-serif text-lg font-bold text-velvety-green">
-          {formatPrice(product.price)}
-        </span>
+        <div className="flex items-baseline gap-1.5">
+          <span className="font-serif text-lg font-bold text-velvety-green">
+            {formatPrice(finalUnitPrice)}
+          </span>
+          {hasDiscount && (
+            <span className="text-xs text-stone-400 line-through">
+              {formatPrice(product.price)}
+            </span>
+          )}
+        </div>
 
         <button
           type="button"
