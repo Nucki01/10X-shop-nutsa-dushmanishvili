@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
 import { useTheme } from '../../context/ThemeContext'
 
-// Shared Header Component (styled with Velvety @theme tokens & Dark Mode toggle)
+// Shared Header Component (PRD P0.3 — 10X Shop logo, Catalog, Cart + badge hidden at 0, Theme toggle, Log in/Log out)
 export function Header() {
   const { user, logout } = useAuth()
   const { totalItems } = useCart()
@@ -40,10 +40,10 @@ export function Header() {
                 : 'text-white/80 hover:text-white transition-colors'
             }
           >
-            Shop
+            Catalog
           </NavLink>
 
-          {/* Cart link with live item count */}
+          {/* Cart link with live item count badge (hidden when totalItems === 0 per PRD P0.3) */}
           <NavLink
             to="/cart"
             className={({ isActive }) =>
@@ -54,7 +54,12 @@ export function Header() {
               }`
             }
           >
-            <span>Cart ({totalItems})</span>
+            <span>Cart</span>
+            {totalItems > 0 && (
+              <span className="bg-[#f6f5f0] text-[#1e2620] text-[11px] font-bold px-1.5 py-0.5 rounded-full leading-none">
+                {totalItems}
+              </span>
+            )}
           </NavLink>
 
           {/* Dark / Light Mode Toggle Button (PRD Tailwind CSS FULL) */}
@@ -76,7 +81,7 @@ export function Header() {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="bg-white text-[#1e2620] hover:bg-stone-200 px-3.5 py-1.5 rounded-xs text-xs font-semibold uppercase tracking-wider cursor-pointer transition-colors"
+                className="bg-[#f6f5f0] text-[#1e2620] hover:bg-[#e9ede8] px-3.5 py-1.5 rounded-xs text-xs font-semibold uppercase tracking-wider cursor-pointer transition-colors"
               >
                 Log out
               </button>
@@ -84,7 +89,7 @@ export function Header() {
           ) : (
             <NavLink
               to="/login"
-              className="bg-white text-[#1e2620] hover:bg-stone-200 px-3.5 py-1.5 rounded-xs text-xs font-semibold uppercase tracking-wider transition-colors"
+              className="bg-[#f6f5f0] text-[#1e2620] hover:bg-[#e9ede8] px-3.5 py-1.5 rounded-xs text-xs font-semibold uppercase tracking-wider transition-colors"
             >
               Log in
             </NavLink>
