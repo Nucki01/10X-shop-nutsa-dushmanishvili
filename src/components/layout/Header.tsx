@@ -17,7 +17,7 @@ export function Header() {
   }
 
   return (
-    <header className="bg-velvety-green dark:bg-[#17211a] text-white border-b border-white/10 transition-colors">
+    <header className="bg-velvety-green dark:bg-stone-900 text-white border-b border-white/10 transition-colors">
       <Container className="py-5 flex flex-wrap items-center justify-between gap-4">
         {/* Brand Logo in Velvety serif style with lining-nums so "10" matches "X" height */}
         <Link to="/" className="flex flex-col">
@@ -56,7 +56,7 @@ export function Header() {
           >
             <span>Cart</span>
             {totalItems > 0 && (
-              <span className="bg-[#f6f5f0] text-[#1e2620] text-[11px] font-bold px-1.5 py-0.5 rounded-full leading-none">
+              <span className="bg-stone-100 text-stone-900 text-[11px] font-bold px-1.5 py-0.5 rounded-full leading-none">
                 {totalItems}
               </span>
             )}
@@ -81,7 +81,7 @@ export function Header() {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="bg-[#f6f5f0] text-[#1e2620] hover:bg-[#e9ede8] px-3.5 py-1.5 rounded-xs text-xs font-semibold uppercase tracking-wider cursor-pointer transition-colors"
+                className="bg-stone-100 text-stone-900 hover:bg-stone-200 px-3.5 py-1.5 rounded-xs text-xs font-semibold uppercase tracking-wider cursor-pointer transition-colors"
               >
                 Log out
               </button>
@@ -89,7 +89,7 @@ export function Header() {
           ) : (
             <NavLink
               to="/login"
-              className="bg-[#f6f5f0] text-[#1e2620] hover:bg-[#e9ede8] px-3.5 py-1.5 rounded-xs text-xs font-semibold uppercase tracking-wider transition-colors"
+              className="bg-stone-100 text-stone-900 hover:bg-stone-200 px-3.5 py-1.5 rounded-xs text-xs font-semibold uppercase tracking-wider transition-colors"
             >
               Log in
             </NavLink>

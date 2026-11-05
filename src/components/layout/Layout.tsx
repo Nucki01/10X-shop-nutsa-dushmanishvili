@@ -14,7 +14,7 @@ export function Layout() {
   }, [pathname])
 
   return (
-    <div className="min-h-screen bg-velvety-cream dark:bg-[#121814] text-velvety-ink dark:text-[#edf1ec] flex flex-col transition-colors">
+    <div className="min-h-screen bg-velvety-cream dark:bg-stone-950 text-velvety-ink dark:text-stone-100 flex flex-col transition-colors">
       <Header />
       <main className="flex-1 py-8">
         <Container>

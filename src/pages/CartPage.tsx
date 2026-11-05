@@ -183,7 +183,7 @@ export function CartPage() {
                 />
                 <button
                   type="submit"
-                  className="bg-velvety-ink hover:bg-velvety-green text-white text-xs uppercase tracking-wider font-medium px-4 py-2 cursor-pointer transition-colors"
+                  className="bg-velvety-green hover:bg-velvety-sage text-white text-xs uppercase tracking-wider font-medium px-4 py-2 cursor-pointer transition-colors"
                 >
                   Apply
                 </button>
