@@ -23,9 +23,9 @@ function mergeWithAestheticProduct(
 }
 
 // Fetch products from DummyJSON API (Requirement A1.6) and map them to our
-// 12 aesthetic Vegan & Cruelty-Free products in mixed category row order.
+// 36 aesthetic Vegan & Cruelty-Free products in mixed category row order.
 export async function fetchCatalogProducts(): Promise<Product[]> {
-  const response = await fetch(`${BASE_URL}/products?limit=12`)
+  const response = await fetch(`${BASE_URL}/products?limit=36`)
   if (!response.ok) {
     throw new Error('Failed to load products from DummyJSON API')
   }
