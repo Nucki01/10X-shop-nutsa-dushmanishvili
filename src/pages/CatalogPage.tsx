@@ -88,7 +88,9 @@ export function CatalogPage() {
 
   function handlePageChange(newPage: number) {
     setCurrentPage(newPage)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    document
+      .getElementById('catalog-products')
+      ?.scrollIntoView({ behavior: 'smooth' })
   }
 
   // Reset all filters when clicking "Clear filters" (PRD P2.3)
@@ -107,7 +109,7 @@ export function CatalogPage() {
       {/* Centered Editorial Section Heading */}
       <div
         id="catalog-products"
-        className="text-center max-w-xl mx-auto space-y-2 pt-2"
+        className="text-center max-w-xl mx-auto space-y-2 pt-2 scroll-mt-24"
       >
         <p className="text-xs uppercase tracking-widest text-velvety-sage">
           Our featured products
