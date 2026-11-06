@@ -1,58 +1,55 @@
 # 10X Shop — Project Plan
 
-**Author:** Nutsa Dushmanishvili  
-**Repository:** `10X_shop_nutsaDushmanishvili`  
-**Design Reference:** Velvety — Beauty & Wellness Website UI Kit (Figma)  
+**Student:** Nutsa Dushmanishvili  
+**Repository:** `10X-shop-nutsa-dushmanishvili`  
+**Design Inspiration:** Velvety — Beauty & Wellness Website UI Kit (Figma)
 
 ---
 
-## 1. Project Goal & Module Scope (CORE First Strategy)
+## 1. My Goal
 
-The goal is to build **10X Shop**, a responsive Single Page Application (SPA) online store using **React 19, TypeScript (strict), Tailwind CSS v4, and React Router**, powered by the **DummyJSON API**.
 
-We followed a **CORE FIRST** methodology: all mandatory CORE requirements across all 5 evaluation modules were completed first before adding Figma visual polish (`@theme`), dark/light mode, debounced search, sorting, reviews, related products, and the `10X10` promo code.
+I decided to follow the **CORE First** rule from our instructions: first make sure all required pages (Catalog, Product Details, Cart, Login, Checkout, and 404) work without bugs, and only after that add extra features like search, sorting, reviews, promo code, and dark mode.
 
-### Module 1: React
-- ✅ **CORE Scope — DONE:** Functional components, `props` & `children`, `useState`/`useEffect`, `.map()` with stable `key`, React Router (`/`, `/login`, `/products/:id`, `/cart`, `/checkout`, `*`), `AuthContext`, `CartContext` (immutable updates), controlled Login & Checkout forms.
-- ✅ **FULL Enhancements — DONE:** Search with `useDebounce`, Category filter, 5-option Sorting, Customer Reviews (`ProductReviews`), Related Products (`RelatedProducts`), and Promo Code `10X10`.
-
-### Module 2: TypeScript
-- ✅ **CORE Scope — DONE:** `"strict": true`, zero `any`, `npm run typecheck` = 0 errors, typed domain models (`Product`, `ProductsResponse`, `Review`, `CartItem`, `AuthUser`, `ShippingInfo`), typed component props & API functions (`src/utils/api.ts`).
-
-### Module 3: Tailwind CSS
-- ✅ **CORE Scope — DONE:** Tailwind CSS v4 via `@tailwindcss/vite`, `@import "tailwindcss"`, utility-first layout (Flex/Grid), mobile-first responsive design (`375px` to desktop), `hover:`, `focus:`, `disabled:` states.
-- ✅ **FULL / BONUS Enhancements — DONE:** Custom Velvety design tokens via `@theme` and class-based Dark/Light Mode (`@custom-variant dark` + `ThemeContext`).
-
-### Module 4: Optimization
-- ✅ **CORE Scope — DONE:** Responsive layout without horizontal scroll on `375px`, `ErrorBoundary` class component, `DEBUG-LOG.md` (3 real bugs), `COMPATIBILITY.md`, lazy image attributes (`loading="lazy"`, `width`, `height`, `aspect-square`).
-
-### Module 5: Practical Process
-- ✅ **CORE Scope — DONE:** `PLAN.md` committed before feature work, meaningful Git commits, `README.md` (EN), `REPORT.md`, and `vercel.json` SPA rewrite configuration.
+### What I Planned for Each Module:
+- **React:** Build reusable components, pass data with `props` and `children`, manage state with `useState` and `useEffect`, use `AuthContext` for login and `CartContext` for the shopping cart, and create controlled forms for Login and Checkout.
+- **TypeScript:** Keep `"strict": true` enabled, write clear interfaces in `src/types/` for products, cart items, users, and orders, and make sure `npm run typecheck` has `0` errors and no `any`.
+- **Tailwind CSS:** Use Tailwind CSS v4 (`@import "tailwindcss"`), make all pages responsive from mobile (`375px`) to desktop, add custom colors with `@theme`, and add a Light / Dark mode button.
+- **Optimization & Debugging:** Use `loading="lazy"` on product images, add an `ErrorBoundary` so the app never shows a blank screen on crash, and record the bugs I fixed in `DEBUG-LOG.md`.
+- **Process:** Write `PLAN.md`, `README.md`, `REPORT.md`, commit my work step by step on GitHub, and deploy the site on Vercel.
 
 ---
 
-## 2. Work Breakdown Structure (WBS)
+## 2. 3-Week Work Plan (Tasks & Schedule)
 
-| Epic | Description | Level | Status |
-| :--- | :--- | :---: | :---: |
-| **Epic 1: Setup & Plan** | Scaffold Vite + React 19 + TS (strict), Tailwind v4, React Router, `PLAN.md` | CORE | ✅ Done |
-| **Epic 2: Architecture & Layout** | Domain types (`src/types/`), `Layout`, `Header`, `Footer`, `Container`, `AppRoutes` | CORE | ✅ Done |
-| **Epic 3: Auth & Login (P1)** | `AuthContext`, controlled `/login` form with validation, `ProtectedRoute` | CORE | ✅ Done |
-| **Epic 4: Catalog (P2)** | DummyJSON API fetch (`src/utils/api.ts`), `ProductGrid`, `ProductCard`, `discountedPrice()` | CORE | ✅ Done |
-| **Epic 5: Product Details (P3)** | `/products/:id` route, stock badges, quantity stepper, Add to Cart, 404 guard | CORE | ✅ Done |
-| **Epic 6: Cart Page (P4)** | `CartContext` + `localStorage`, `/cart` item list, stepper, remove, confirm clear cart | CORE | ✅ Done |
-| **Epic 7: Checkout (P5)** | Controlled `/checkout` form (`fullName`, `email`, `address`, `city`), validation, confirmation | CORE | ✅ Done |
-| **Epic 8: Quality & Debugging** | `ErrorBoundary`, `DEBUG-LOG.md`, `COMPATIBILITY.md`, `vercel.json` | CORE | ✅ Done |
-| **Epic 9: Velvety Figma Theme & Dark Mode** | `@theme` tokens, `HeroBanner`, `ThemeContext` Light/Dark mode toggle | FULL | ✅ Done |
-| **Epic 10: Extended Catalog & Cart Features** | Debounced search (`useDebounce`), 5-option Sort, Reviews, Related Products, Promo `10X10` | FULL | ✅ Done |
+### Week 1 (Oct 17 – Oct 23): Project Setup, Routing, Login & Catalog
+- **Task 1 — Project Setup (CORE):** Create Vite + React + TypeScript project, install Tailwind CSS v4 and React Router, and write `PLAN.md`.
+  - *Definition of Done:* `npm run typecheck` and `npm run build` pass with 0 errors.
+- **Task 2 — Types & Layout (CORE):** Create TypeScript interfaces in `src/types/` and build `Layout`, `Header`, `Footer`, `Container`, and `NotFoundPage`.
+  - *Definition of Done:* Navigation between pages works without reloading the browser.
+- **Task 3 — Login & Protected Route (CORE):** Create `AuthContext`, build the `/login` page with Username and Password validation, and protect `/checkout` with `ProtectedRoute`.
+  - *Definition of Done:* Guests trying to open `/checkout` are sent to `/login` first and redirected back after logging in.
+- **Task 4 — Catalog Page (CORE):** Fetch products from DummyJSON API (`GET /products`) using `useEffect`, handle loading and error states, and display cards with `ProductGrid` and `ProductCard`.
+  - *Definition of Done:* 12 vegan & cruelty-free beauty products appear on the home page.
+
+### Week 2 (Oct 24 – Oct 30): Product Details, Cart & Checkout
+- **Task 5 — Product Details Page (CORE):** Build `/products/:id` using `useParams()`, show product photo, description, Euro price, stock status (`In stock` / `Only N left!` / `Out of stock`), and quantity buttons (`-` / `+`).
+  - *Definition of Done:* Clicking a product opens its detail page; wrong IDs show the 404 page.
+- **Task 6 — Cart Context & Cart Page (CORE):** Create `CartContext` with `addItem`, `removeItem`, `updateQuantity`, and `clearCart` saved in `localStorage` (`shop_cart`), and build `/cart`.
+  - *Definition of Done:* Adding or removing items updates the Header badge and cart total immediately.
+- **Task 7 — Checkout & Order Confirmation (CORE):** Build the `/checkout` controlled form (`Full name`, `Email`, `Address`, `City`) with validation and show the `"Thank you! Your order has been placed."` screen on submit.
+  - *Definition of Done:* Submitting valid shipping info shows the confirmation screen and empties the cart.
+
+### Week 3 (Oct 31 – Nov 6): Styling, Extra Features, Testing & Deploy
+- **Task 8 — Velvety Theme & Dark Mode (FULL):** Add Velvety colors and fonts in `@theme` (`src/index.css`), build `HeroBanner`, and add `ThemeContext` for Light / Dark mode.
+  - *Definition of Done:* All pages match the Velvety style and switch cleanly between Light and Dark mode.
+- **Task 9 — Extra Catalog, Product & Cart Features (FULL):** Add debounced search (`useDebounce`), category filter buttons, 5 sorting options, customer reviews (`ProductReviews`), related products (`RelatedProducts`), and promo code `10X10`.
+  - *Definition of Done:* Search, sort, reviews, and the `10X10` 10% discount work smoothly.
+- **Task 10 — Quality Check, Docs & Deploy (CORE):** Add `ErrorBoundary`, write `DEBUG-LOG.md`, `COMPATIBILITY.md`, `README.md`, and `REPORT.md`, and deploy to Vercel.
+  - *Definition of Done:* All checks pass (`0` errors) and live link works when refreshing `/products/5`.
 
 ---
 
-## 3. Risks & Mitigation Plan
 
-1. **Risk 1: DummyJSON API downtime or slow network response.**
-   - *Mitigation:* Implemented explicit `loading` and `error` UI states with a `"Try again"` retry button in `CatalogPage.tsx` and `ProductPage.tsx`.
-2. **Risk 2: Corrupted or invalid JSON data in `localStorage` (`shop_cart`, `shop_reviews`, `shop_theme`).**
-   - *Mitigation:* Wrapped all `localStorage` reads/writes in `try/catch` blocks with safe default fallbacks and wrapped the app in `ErrorBoundary`.
-3. **Risk 3: Broken direct URL refresh (`/products/5`) after deploying to Vercel.**
-   - *Mitigation:* Added `vercel.json` with SPA rewrite rule (`"/(.*)" -> "/index.html"`).
+   
+

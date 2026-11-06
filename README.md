@@ -3,6 +3,7 @@
 **Author:** Nutsa Dushmanishvili  
 **Repository:** [https://github.com/Nucki01/10X-shop-nutsa-dushmanishvili](https://github.com/Nucki01/10X-shop-nutsa-dushmanishvili)  
 **Live Demo:** [https://10-x-shop-nutsa-dushmanishvili.vercel.app/](https://10-x-shop-nutsa-dushmanishvili.vercel.app/)
+**youtube demo video link:** [https://www.youtube.com/watch?v=j1jrfNu8lKU]  no audio
 
 ---
 
@@ -65,39 +66,10 @@ src/
 
 ---
 
-## How to Run Locally
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/Nucki01/10X-shop-nutsa-dushmanishvili.git
-   cd 10X-shop-nutsa-dushmanishvili
-   ```
-2. Install packages:
-   ```bash
-   npm install
-   ```
-3. Start the dev server:
-   ```bash
-   npm run dev
-   ```
-4. Open `http://localhost:5173` in your browser.
-
----
-
-## Scripts
-
-- `npm run dev` — Start local development server
-- `npm run typecheck` — Check TypeScript types (`0` errors)
-- `npm run lint` — Run linter (`0` warnings/errors)
-- `npm run build` — Build for production
-- `npm run preview` — Preview production build
-
----
-
 ## Test Login & Promo Code
 
-- **Username:** `emilys` (or any username)
-- **Password:** `emilyspass` (or any password with 6+ characters)
+- **Username:** any username
+- **Password:** any password with 6+ characters
 - **Promo Code in Cart:** `10X10` (10% discount)
 
 ---
