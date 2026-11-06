@@ -4,27 +4,31 @@ import {
   CatalogToolbar,
   type SortOption,
 } from '../components/product/CatalogToolbar'
+import { Pagination } from '../components/product/Pagination'
 import { ProductGrid } from '../components/product/ProductGrid'
 import { useDebounce } from '../hooks/useDebounce'
 import type { Product } from '../types/product'
 import { BEAUTY_CATEGORIES, fetchCatalogProducts } from '../utils/api'
 
-// P2 — Catalog Page (/) [CORE + FULL Search, Category Filter & Sorting with DummyJSON API]
+const ITEMS_PER_PAGE = 12
+
+// P2 — Catalog Page (/) [CORE + FULL Search, Category Filter, Sorting & 12-per-page Pagination]
 export function CatalogPage() {
   // 1. API Data, Loading & Error State (PRD Requirement A1.6 & P2.1)
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 
-  // 2. Filter & Sort State
+  // 2. Filter, Sort & Page State
   const [selectedCategory, setSelectedCategory] = useState<string>('All')
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [sortBy, setSortChange] = useState<SortOption>('')
+  const [currentPage, setCurrentPage] = useState<number>(1)
 
   // 3. Debounce the search query by 400ms (PRD P2.4)
   const debouncedSearch = useDebounce(searchQuery, 400)
 
-  // 4. Load beauty, skin-care, and fragrance products from DummyJSON API
+  // 4. Load 36 vegan beauty products from DummyJSON API
   async function loadProducts() {
     setLoading(true)
     setError(null)
@@ -33,7 +37,9 @@ export function CatalogPage() {
       setProducts(data)
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : 'Something went wrong loading products.'
+        err instanceof Error
+          ? err.message
+          : 'Something went wrong loading products.'
       )
     } finally {
       setLoading(false)
@@ -43,6 +49,11 @@ export function CatalogPage() {
   useEffect(() => {
     loadProducts()
   }, [])
+
+  // Reset back to Page 1 whenever category, search, or sort changes (PRD P2.8)
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [selectedCategory, debouncedSearch, sortBy])
 
   // 5. Filter products by Category and Debounced Search text
   const filteredProducts = products.filter((product) => {
@@ -67,11 +78,25 @@ export function CatalogPage() {
     return 0
   })
 
+  // 7. Paginate: show 12 products per page (PRD P2.7)
+  const totalPages = Math.ceil(sortedProducts.length / ITEMS_PER_PAGE)
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+  const paginatedProducts = sortedProducts.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE
+  )
+
+  function handlePageChange(newPage: number) {
+    setCurrentPage(newPage)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   // Reset all filters when clicking "Clear filters" (PRD P2.3)
   function handleClearFilters() {
     setSelectedCategory('All')
     setSearchQuery('')
     setSortChange('')
+    setCurrentPage(1)
   }
 
   return (
@@ -92,7 +117,7 @@ export function CatalogPage() {
         </h2>
       </div>
 
-      {/* Category Filter Buttons (from DummyJSON Beauty & Wellness categories) */}
+      {/* Category Filter Buttons */}
       <div className="flex flex-wrap justify-center gap-2">
         {BEAUTY_CATEGORIES.map((category) => {
           const isActive = selectedCategory === category.slug
@@ -122,7 +147,7 @@ export function CatalogPage() {
         resultCount={sortedProducts.length}
       />
 
-      {/* Loading State, Error State, Empty State, or Product Grid */}
+      {/* Loading State, Error State, Empty State, or Paginated Product Grid */}
       {loading ? (
         <div className="bg-white border border-stone-200 p-10 text-center">
           <p className="text-stone-600">Loading products...</p>
@@ -150,7 +175,23 @@ export function CatalogPage() {
           </button>
         </div>
       ) : (
-        <ProductGrid products={sortedProducts} />
+        <div className="space-y-6">
+          <ProductGrid products={paginatedProducts} />
+
+          {/* Bottom Pagination Bar + Showing X–Y of Z text (PRD P2.1 & P2.7) */}
+          <div className="space-y-2 text-center">
+            <Pagination
+              page={currentPage}
+              totalPages={totalPages}
+              onChange={handlePageChange}
+            />
+            <p className="text-xs text-stone-500">
+              Showing {startIndex + 1}–
+              {Math.min(startIndex + ITEMS_PER_PAGE, sortedProducts.length)} of{' '}
+              {sortedProducts.length} products
+            </p>
+          </div>
+        </div>
       )}
     </section>
   )
