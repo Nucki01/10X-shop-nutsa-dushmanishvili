@@ -13,7 +13,7 @@ interface ErrorBoundaryState {
 // In React, an Error Boundary must be a class component that implements
 // `static getDerivedStateFromError` and `componentDidCatch`.
 // If any child component throws an unexpected error during rendering, this component catches it
-// and displays "Something went wrong." + a "Reload" button instead of a blank white screen.
+// and displays "Something went wrong." + a "Reload" button instead of a blank screen.
 export class ErrorBoundary extends Component<
   ErrorBoundaryProps,
   ErrorBoundaryState
@@ -36,9 +36,9 @@ export class ErrorBoundary extends Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-stone-50 flex items-center justify-center p-4">
-          <div className="bg-white border border-stone-200 rounded-xl p-8 max-w-md w-full text-center space-y-4">
-            <h1 className="text-xl font-bold text-stone-900">
+        <div className="min-h-screen bg-velvety-cream text-velvety-ink flex items-center justify-center p-4">
+          <div className="bg-white border border-stone-200 p-8 max-w-md w-full text-center space-y-4">
+            <h1 className="font-serif text-2xl font-bold text-velvety-ink">
               Something went wrong.
             </h1>
             <p className="text-sm text-stone-600">
@@ -47,7 +47,7 @@ export class ErrorBoundary extends Component<
             <button
               type="button"
               onClick={() => window.location.reload()}
-              className="bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-medium px-5 py-2.5 rounded-lg cursor-pointer"
+              className="bg-velvety-green hover:bg-velvety-sage text-white text-xs uppercase tracking-wider font-medium px-6 py-3 cursor-pointer transition-colors"
             >
               Reload
             </button>
