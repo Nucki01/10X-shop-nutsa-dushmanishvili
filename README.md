@@ -1,8 +1,8 @@
 # 10X Shop
 
 **Author:** Nutsa Dushmanishvili  
-**Repository:** [https://github.com/Nucki01/10X_shop_nutsaDushmanishvili](https://github.com/Nucki01/10X_shop_nutsaDushmanishvili)  
-**Live Demo:** [https://10x-shop-nutsa-dushmanishvilii.vercel.app/](https://10x-shop-nutsa-dushmanishvilii.vercel.app/)
+**Repository:** [https://github.com/Nucki01/10X-shop-nutsa-dushmanishvili](https://github.com/Nucki01/10X-shop-nutsa-dushmanishvili)  
+**Live Demo:** [https://10-x-shop-nutsa-dushmanishvili.vercel.app/](https://10-x-shop-nutsa-dushmanishvili.vercel.app/)
 
 ---
 
@@ -69,8 +69,8 @@ src/
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/Nucki01/10X_shop_nutsaDushmanishvili.git
-   cd 10X_shop_nutsaDushmanishvili
+   git clone https://github.com/Nucki01/10X-shop-nutsa-dushmanishvili.git
+   cd 10X-shop-nutsa-dushmanishvili
    ```
 2. Install packages:
    ```bash
