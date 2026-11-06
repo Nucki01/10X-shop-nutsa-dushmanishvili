@@ -1,57 +1,56 @@
-# 10X Shop — Vegan & Cruelty-Free Beauty Edition
+# 10X Shop
 
 **Author:** Nutsa Dushmanishvili  
 **Repository:** [https://github.com/Nucki01/10X_shop_nutsaDushmanishvili](https://github.com/Nucki01/10X_shop_nutsaDushmanishvili)  
-**Live Demo:** *(Add your Vercel link here after deploying)*
+**Live Demo:** [https://10x-shop-nutsa-dushmanishvilii.vercel.app/](https://10x-shop-nutsa-dushmanishvilii.vercel.app/)
 
 ---
 
 ## About
 
-**10X Shop** is a responsive Single Page Application (SPA) online store built with **React 19, TypeScript (strict mode), Tailwind CSS v4, and React Router**, powered by the **DummyJSON API**. Inspired by the **Velvety — Beauty & Wellness Website UI Kit (Figma)**, it features a 100% Vegan & Cruelty-Free beauty catalog across *Skincare*, *Hair Care*, and *Body & Personal Care* with debounced search, category filtering, 5-option sorting, customer reviews, promo code discounts, dark/light theme support, and a validated checkout flow.
+**10X Shop** is a Single Page Application (SPA) online beauty store built with **React, TypeScript, Tailwind CSS v4, and React Router**. It loads product data from the **DummyJSON API** and presents a 100% Vegan & Cruelty-Free beauty catalog inspired by the **Velvety — Beauty & Wellness UI Kit**. Users can browse and filter products, search, sort, read or write reviews, add items to a persistent cart, apply a promo code, switch between Light and Dark mode, and complete a simulated checkout.
 
 ---
 
 ## Features
 
 ### CORE Features
-- **Catalog (`/`):** Fetches products from the DummyJSON API (`GET /products?limit=12`) inside `useEffect` with `loading`, `error` (`Try again`), and `empty` states, mapped to 12 aesthetic vegan beauty items in mixed category rows.
-- **Product Details (`/products/:id`):** Dynamic route using `useParams()` and `GET /products/:id` displaying product photo, brand, category, discounted Euro price (`discountedPrice()`), stock badge (`In stock` / `Only N left!` / `Out of stock`), quantity stepper (`− / +`), and *Add to cart*. Invalid IDs safely render the 404 Not Found page.
-- **Shopping Cart (`/cart` & `CartContext`):** Shared cart state using immutable array updates (`.map()`, `.filter()`), persisted in `localStorage` (`shop_cart`), with live Header badge (hidden when `0`), quantity controls, item removal, confirmed *Clear cart*, and Euro order summary.
-- **Simulated Login (`/login` & `AuthContext`):** Controlled login form (`useState` + `onSubmit` + `preventDefault`) with exact required inline validation (`Username is required`, `Password is required`, `Password must be at least 6 characters`).
-- **Protected Checkout (`/checkout` & `ProtectedRoute`):** Redirects guests to `/login` and returns them to `/checkout` after login. Validates `Full name`, `Email`, `Address`, and `City`, displays *"Thank you! Your order has been placed."* with the order total, and clears the cart.
-- **Error Handling & 404 (`*`):** Custom `NotFoundPage` (`Page not found`) and class-based `ErrorBoundary` fallback component (`Something went wrong.` + `Reload`).
+- **Catalog (`/`):** Loads 36 products from DummyJSON (`GET /products?limit=36`) inside `useEffect` with `loading`, `error` (`Try again`), and `empty` states.
+- **Product Details (`/products/:id`):** Uses `useParams()` and `GET /products/:id` to show the product image, description, discounted Euro price, stock status (`In stock` / `Only N left!` / `Out of stock`), and a quantity selector (`− / +`). Unknown IDs show the 404 page.
+- **Shopping Cart (`/cart` & `CartContext`):** Stores cart items in React Context and `localStorage` (`shop_cart`) using immutable `.map()` and `.filter()` updates. Shows a live item count badge in the Header.
+- **Login (`/login` & `AuthContext`):** Controlled login form with validation (`Username is required`, `Password must be at least 6 characters`).
+- **Protected Checkout (`/checkout` & `ProtectedRoute`):** Sends guests to `/login` first and redirects them back to `/checkout` after signing in. Validates `Full name`, `Email`, `Address`, and `City`, shows the `"Thank you! Your order has been placed."` message, and clears the cart.
+- **404 & Error Boundary (`*`):** Custom `NotFoundPage` for unknown URLs and an `ErrorBoundary` component to catch unexpected crashes.
 
-### FULL / Extended Features Implemented
-- **Search, Category Filter & Sorting (`CatalogToolbar.tsx` & `useDebounce.ts`):** Debounced search (`400ms`), category filter tabs, and 5-option sorting (`Default`, `Price: Low to High`, `Price: High to Low`, `Rating: High to Low`, `Name: A–Z`).
-- **Product Reviews & Related Products (`ProductReviews.tsx` & `RelatedProducts.tsx`):** Displays DummyJSON API reviews + user-submitted reviews saved in `localStorage` (`shop_reviews`) with validation, plus related products from the same category.
-- **Promo Code `10X10` (`CartContext.tsx` & `CartPage.tsx`):** Case-insensitive promo code `10X10` applies a 10% discount (`Discount (10X10 −10%)`) and shows `Invalid promo code` for invalid codes.
-- **Custom `@theme` Tokens & Dark/Light Mode (`src/index.css` & `ThemeContext.tsx`):** Uses Tailwind CSS v4 `@theme` design tokens and `@custom-variant dark` with a persistent header theme toggle (`shop_theme`).
+### Extra (FULL) Features
+- **Search, Category Filter, Sort & Pagination:** Search bar with `useDebounce` (`400ms`), category buttons (*All*, *Skincare*, *Hair Care*, *Body & Personal Care*), 5 sorting options, and 12-per-page pagination (`‹ Prev 1 2 3 Next ›`).
+- **Reviews & Related Products:** Customer reviews on the Product Details page (saved in `localStorage` under `shop_reviews`) and related products from the same category.
+- **Promo Code (`10X10`):** Entering `10X10` in the cart gives a 10% discount; wrong codes show `"Invalid promo code"`.
+- **Dark & Light Mode:** Theme toggle button in the Header using Tailwind v4 `@theme` and `ThemeContext` (saved in `localStorage` under `shop_theme`).
 
 ---
 
 ## Tech Stack
 
-- **Framework:** React 19 (Functional Components & Hooks)
-- **Build Tool:** Vite 8
-- **Language:** TypeScript (`"strict": true`, zero `any`)
-- **Routing:** React Router v7 (`BrowserRouter`, `Routes`, `Route`, `Outlet`, `Link`, `NavLink`, `useParams`, `useNavigate`, `useLocation`)
-- **Styling:** Tailwind CSS v4 (`@tailwindcss/vite`, `@import "tailwindcss"`, `@theme`, `@custom-variant dark`)
-- **Linting:** Oxlint (`react/rules-of-hooks`, `typescript/no-explicit-any`)
+- **React 19** (Functional Components, `useState`, `useEffect`, `useContext`)
+- **TypeScript** (`"strict": true`, zero `any`)
+- **React Router v7** (`BrowserRouter`, `Routes`, `Route`, `Outlet`, `Link`, `NavLink`, `useParams`, `useNavigate`, `useLocation`)
+- **Tailwind CSS v4** (`@tailwindcss/vite`, `@import "tailwindcss"`, `@theme`, `@custom-variant dark`)
+- **Vite 8** & **Oxlint**
 
 ---
 
-## Architecture & Folder Structure
+## Folder Structure & Data Flow
 
 ```text
 src/
   components/
     cart/          OrderConfirmation.tsx
     layout/        Header.tsx, Footer.tsx, Layout.tsx
-    product/       HeroBanner.tsx, CatalogToolbar.tsx, ProductCard.tsx, ProductGrid.tsx, ProductReviews.tsx, RelatedProducts.tsx
+    product/       HeroBanner.tsx, CatalogToolbar.tsx, ProductCard.tsx, ProductGrid.tsx, Pagination.tsx, ProductReviews.tsx, RelatedProducts.tsx
     ui/            Container.tsx, ErrorBoundary.tsx
   context/         AuthContext.tsx, CartContext.tsx, ThemeContext.tsx
-  data/            products.ts (12 vegan & cruelty-free beauty products & categories)
+  data/            products.ts
   hooks/           useDebounce.ts
   pages/           CatalogPage.tsx, ProductPage.tsx, CartPage.tsx, LoginPage.tsx, CheckoutPage.tsx, NotFoundPage.tsx
   routes/          AppRoutes.tsx, ProtectedRoute.tsx
@@ -59,23 +58,25 @@ src/
   utils/           api.ts, format.ts, checkoutValidation.ts
 ```
 
-**Data Flow:**  
-User actions (clicks, inputs, form submissions) trigger event handlers that call `useState` setters or React Context methods (`AuthContext`, `CartContext`, `ThemeContext`). State is updated immutably, causing React to re-render the affected components automatically. Product data is fetched asynchronously inside `useEffect` via `src/utils/api.ts` from DummyJSON endpoints (`GET /products` and `GET /products/:id`).
+**How Data Flows in the App:**  
+1. When a page opens, `useEffect` calls helper functions in `src/utils/api.ts` to fetch data from DummyJSON and saves it with `useState`.
+2. Shared data (logged-in user, cart items, and dark/light theme) lives in `AuthContext`, `CartContext`, and `ThemeContext` so any component can use it without passing props through many levels.
+3. When the user clicks a button or submits a form, an event handler updates state immutably, and React automatically updates the screen.
 
 ---
 
 ## How to Run Locally
 
-1. **Clone the repository:**
+1. Clone the repository:
    ```bash
    git clone https://github.com/Nucki01/10X_shop_nutsaDushmanishvili.git
    cd 10X_shop_nutsaDushmanishvili
    ```
-2. **Install dependencies:**
+2. Install packages:
    ```bash
    npm install
    ```
-3. **Start the development server:**
+3. Start the dev server:
    ```bash
    npm run dev
    ```
@@ -83,32 +84,31 @@ User actions (clicks, inputs, form submissions) trigger event handlers that call
 
 ---
 
-## Available Scripts
+## Scripts
 
-- `npm run dev` — Starts the local Vite development server.
-- `npm run typecheck` — Runs strict TypeScript type checking (`tsc --noEmit -p tsconfig.app.json`) with 0 errors.
-- `npm run lint` — Runs `oxlint` to check React and TypeScript rules.
-- `npm run build` — Compiles TypeScript and builds the production bundle into `dist/`.
-- `npm run preview` — Previews the production build locally.
-
----
-
-## Test Account & Promo Code
-
-- **Username:** `emilys` (or any non-empty username)
-- **Password:** `emilyspass` (or any password with at least 6 characters)
-- **Promo Code:** `10X10` (gives 10% off in Cart)
+- `npm run dev` — Start local development server
+- `npm run typecheck` — Check TypeScript types (`0` errors)
+- `npm run lint` — Run linter (`0` warnings/errors)
+- `npm run build` — Build for production
+- `npm run preview` — Preview production build
 
 ---
 
-## Limitations & Scope Notes
+## Test Login & Promo Code
 
-- Authentication (`/login`) is a local React Context simulation as required by the PRD; no external auth server or JWT token is used.
-- Checkout (`/checkout`) validates shipping details and simulates order placement locally without processing real payment card data.
+- **Username:** `emilys` (or any username)
+- **Password:** `emilyspass` (or any password with 6+ characters)
+- **Promo Code in Cart:** `10X10` (10% discount)
+
+---
+
+## Limitations
+
+- Login and Checkout are front-end simulations using React state and Context (no real payment processing or backend auth server is used, per project requirements).
 
 ---
 
 ## Credits
 
-- Built by **Nutsa Dushmanishvili** for the **10X Front-end Diploma Project (2026)**.
-- UI inspiration: **Velvety — Beauty & Wellness Website UI Kit (Figma)**.
+- Created by **Nutsa Dushmanishvili** for the **10X Front-end Diploma Project (2026)**.
+- Design template inspiration: **Velvety — Beauty & Wellness Website UI Kit (Figma)**.

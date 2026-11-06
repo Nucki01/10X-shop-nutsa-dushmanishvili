@@ -88,9 +88,14 @@ export function CatalogPage() {
 
   function handlePageChange(newPage: number) {
     setCurrentPage(newPage)
-    document
-      .getElementById('catalog-products')
-      ?.scrollIntoView({ behavior: 'smooth' })
+    setTimeout(() => {
+      const catalogSection = document.getElementById('catalog-products')
+      if (catalogSection) {
+        const top =
+          catalogSection.getBoundingClientRect().top + window.scrollY - 80
+        window.scrollTo({ top, behavior: 'smooth' })
+      }
+    }, 0)
   }
 
   // Reset all filters when clicking "Clear filters" (PRD P2.3)
