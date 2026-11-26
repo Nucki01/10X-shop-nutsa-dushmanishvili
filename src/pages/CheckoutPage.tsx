@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import { OrderConfirmation } from '../components/cart/OrderConfirmation'
+import type { Order } from '../types/order'
 import {
   validateCheckoutForm,
   type CheckoutErrors,
 } from '../utils/checkoutValidation'
 import { discountedPrice, formatPrice } from '../utils/format'
+import { saveOrder } from '../utils/storage'
 
 // P5 — Checkout Page (/checkout) [CORE Steps 14 & 15]
 // Styled with Velvety @theme tokens (font-serif, bg-velvety-green).
@@ -23,20 +25,24 @@ export function CheckoutPage() {
     clearCart,
   } = useCart()
 
-  // 1. Controlled Form State for the 4 required fields
-  const [fullName, setFullName] = useState(user.username || '')
-  const [email, setEmail] = useState('')
+  // 1. Controlled Form State for the 4 required fields (pre-filled from logged-in user's profile)
+  const [fullName, setFullName] = useState(
+    user.fullName || user.username || ''
+  )
+  const [email, setEmail] = useState(user.email || '')
   const [address, setAddress] = useState('')
   const [city, setCity] = useState('')
 
   // 2. State for validation errors and completed order
   const [errors, setErrors] = useState<CheckoutErrors>({})
   const [placedOrderTotal, setPlacedOrderTotal] = useState<number | null>(null)
+  const [placedOrderId, setPlacedOrderId] = useState<string>('')
 
   // 3. If the order was just placed, show the "Thank you!" confirmation screen (PRD Step 15)
   if (placedOrderTotal !== null) {
     return (
       <OrderConfirmation
+        orderId={placedOrderId}
         shipping={{ fullName, email, address, city }}
         total={placedOrderTotal}
       />
@@ -73,8 +79,36 @@ export function CheckoutPage() {
       return
     }
 
-    // Valid order: save final discounted total for confirmation screen and empty the cart
+    // Valid order: create an Order record in localStorage (`shop_orders`), save final total, and empty the cart
+    const orderId = `ORD-${Date.now().toString().slice(-6)}`
+    const newOrder: Order = {
+      id: orderId,
+      username: user.username,
+      createdAt: new Date().toISOString().split('T')[0],
+      shipping: {
+        fullName: fullName.trim(),
+        email: email.trim(),
+        address: address.trim(),
+        city: city.trim(),
+      },
+      items: items.map((item) => ({
+        productId: item.productId,
+        title: item.title,
+        thumbnail: item.thumbnail,
+        price: item.price,
+        discountPercentage: item.discountPercentage,
+        quantity: item.quantity,
+      })),
+      subtotal: totalPrice,
+      discountAmount,
+      promoCode,
+      total: finalPrice,
+      status: 'completed',
+    }
+    saveOrder(newOrder)
+
     setErrors({})
+    setPlacedOrderId(orderId)
     setPlacedOrderTotal(finalPrice)
     clearCart()
   }
