@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
-// P1 — Login Page (/login) [CORE Step 5]
+// P1 — Login Page (/login) [CORE Step 5 + Registered Account Verification]
 // Styled with Velvety @theme tokens (font-serif, bg-velvety-green).
 export function LoginPage() {
   const { login } = useAuth()
@@ -16,8 +16,9 @@ export function LoginPage() {
   // Error messages stored in React state
   const [usernameError, setUsernameError] = useState('')
   const [passwordError, setPasswordError] = useState('')
+  const [authError, setAuthError] = useState('')
 
-  // Check if ProtectedRoute sent the user here from "/checkout"
+  // Check if ProtectedRoute sent the user here from "/checkout", "/orders", or "/profile"
   const state = location.state as { from?: string } | null
   const redirectPath = state?.from || '/'
 
@@ -29,6 +30,7 @@ export function LoginPage() {
     let hasError = false
     setUsernameError('')
     setPasswordError('')
+    setAuthError('')
 
     // 3. Validate Username (PRD P1.2: required)
     if (!username.trim()) {
@@ -50,8 +52,13 @@ export function LoginPage() {
       return
     }
 
-    // 5. Save login state in AuthContext and navigate to /checkout or /
-    login(username)
+    // 5. Verify credentials against registered users in localStorage (`shop_users`)
+    const result = login(username, password)
+    if (!result.success) {
+      setAuthError(result.error || 'Invalid login credentials.')
+      return
+    }
+
     navigate(redirectPath)
   }
 
@@ -70,8 +77,15 @@ export function LoginPage() {
         </p>
         <h1 className="font-serif text-3xl text-velvety-ink mb-2">Log In</h1>
         <p className="text-xs text-stone-600 mb-6">
-          Enter any username and password (at least 6 characters).
+          Sign in with your registered account (or demo account{' '}
+          <strong>emilys</strong> / <strong>emilyspass</strong>).
         </p>
+
+        {authError && (
+          <div className="bg-red-50 border border-red-200 text-red-700 text-xs p-3 mb-4">
+            {authError}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Username Input */}
@@ -124,6 +138,17 @@ export function LoginPage() {
             Log In
           </button>
         </form>
+
+        <p className="text-xs text-stone-600 text-center mt-6 pt-4 border-t border-stone-200">
+          Don&apos;t have an account yet?{' '}
+          <Link
+            to="/register"
+            state={state}
+            className="text-velvety-green font-semibold underline"
+          >
+            Register here
+          </Link>
+        </p>
       </div>
     </section>
   )
