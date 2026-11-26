@@ -17,14 +17,14 @@ export function Header() {
   }
 
   return (
-    <header className="bg-velvety-green dark:bg-stone-900 text-white border-b border-white/10 transition-colors">
+    <header className="bg-velvety-green text-white border-b border-white/10 transition-colors">
       <Container className="py-5 flex flex-wrap items-center justify-between gap-4">
         {/* Brand Logo in Velvety serif style with lining-nums so "10" matches "X" height */}
         <Link to="/" className="flex flex-col">
           <span className="font-serif lining-nums text-2xl tracking-widest uppercase">
             10X Shop
           </span>
-          <span className="text-[10px] tracking-widest uppercase text-velvety-mist/80 dark:text-stone-300">
+          <span className="text-[10px] tracking-widest uppercase text-white/80">
             Beauty &amp; Personal Care
           </span>
         </Link>
