@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { HeroBanner } from '../components/product/HeroBanner'
 import {
   CatalogToolbar,
@@ -11,30 +12,48 @@ import type { Product } from '../types/product'
 import { BEAUTY_CATEGORIES, fetchCatalogProducts } from '../utils/api'
 
 const ITEMS_PER_PAGE = 12
+const VALID_SORTS: SortOption[] = [
+  '',
+  'price-asc',
+  'price-desc',
+  'rating-desc',
+  'title-asc',
+]
 
-// P2 — Catalog Page (/) [CORE + FULL Search, Category Filter, Sorting & 12-per-page Pagination]
+// P2 — Catalog Page (/) [CORE + FULL Search, Category Filter, Sorting, Pagination & URL Search Params]
 export function CatalogPage() {
+  const [searchParams, setSearchParams] = useSearchParams()
+
   // 1. API Data, Loading & Error State (PRD Requirement A1.6 & P2.1)
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 
-  // 2. Filter, Sort & Page State
-  const [selectedCategory, setSelectedCategory] = useState<string>('All')
-  const [searchQuery, setSearchQuery] = useState<string>('')
-  const [sortBy, setSortChange] = useState<SortOption>('')
-  const [currentPage, setCurrentPage] = useState<number>(1)
+  // 2. Initialize Filter, Sort & Page State from URL Search Params (PRD P2.8 FULL)
+  const [selectedCategory, setSelectedCategory] = useState<string>(
+    () => searchParams.get('category') || 'All'
+  )
+  const [searchQuery, setSearchQuery] = useState<string>(
+    () => searchParams.get('q') || ''
+  )
+  const [sortBy, setSortChange] = useState<SortOption>(() => {
+    const rawSort = (searchParams.get('sort') || '') as SortOption
+    return VALID_SORTS.includes(rawSort) ? rawSort : ''
+  })
+  const [currentPage, setCurrentPage] = useState<number>(() => {
+    const rawPage = Number(searchParams.get('page'))
+    return !Number.isNaN(rawPage) && rawPage >= 1 ? rawPage : 1
+  })
 
   // 3. Debounce the search query by 400ms (PRD P2.4)
   const debouncedSearch = useDebounce(searchQuery, 400)
 
   // 4. Load 36 vegan beauty products from DummyJSON API
   async function loadProducts() {
-    setLoading(true)
-    setError(null)
     try {
       const data = await fetchCatalogProducts()
       setProducts(data)
+      setError(null)
     } catch (err) {
       setError(
         err instanceof Error
@@ -46,14 +65,54 @@ export function CatalogPage() {
     }
   }
 
+  function handleRetry() {
+    setLoading(true)
+    setError(null)
+    void loadProducts()
+  }
+
   useEffect(() => {
-    loadProducts()
+    void loadProducts()
   }, [])
 
-  // Reset back to Page 1 whenever category, search, or sort changes (PRD P2.8)
+  // Sync URL query parameters whenever category, debounced search, sort, or page changes (PRD P2.8 FULL)
   useEffect(() => {
+    const nextParams = new URLSearchParams()
+    if (selectedCategory !== 'All') {
+      nextParams.set('category', selectedCategory)
+    }
+    if (debouncedSearch.trim() !== '') {
+      nextParams.set('q', debouncedSearch.trim())
+    }
+    if (sortBy !== '') {
+      nextParams.set('sort', sortBy)
+    }
+    if (currentPage > 1) {
+      nextParams.set('page', String(currentPage))
+    }
+    setSearchParams(nextParams, { replace: true })
+  }, [
+    selectedCategory,
+    debouncedSearch,
+    sortBy,
+    currentPage,
+    setSearchParams,
+  ])
+
+  function handleCategorySelect(categorySlug: string) {
+    setSelectedCategory(categorySlug)
     setCurrentPage(1)
-  }, [selectedCategory, debouncedSearch, sortBy])
+  }
+
+  function handleSearchInput(value: string) {
+    setSearchQuery(value)
+    setCurrentPage(1)
+  }
+
+  function handleSortSelect(value: SortOption) {
+    setSortChange(value)
+    setCurrentPage(1)
+  }
 
   // 5. Filter products by Category and Debounced Search text
   const filteredProducts = products.filter((product) => {
@@ -80,7 +139,8 @@ export function CatalogPage() {
 
   // 7. Paginate: show 12 products per page (PRD P2.7)
   const totalPages = Math.ceil(sortedProducts.length / ITEMS_PER_PAGE)
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+  const safePage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1
+  const startIndex = (safePage - 1) * ITEMS_PER_PAGE
   const paginatedProducts = sortedProducts.slice(
     startIndex,
     startIndex + ITEMS_PER_PAGE
@@ -132,7 +192,7 @@ export function CatalogPage() {
             <button
               key={category.slug}
               type="button"
-              onClick={() => setSelectedCategory(category.slug)}
+              onClick={() => handleCategorySelect(category.slug)}
               className={`px-5 py-2 text-xs uppercase tracking-wider font-medium cursor-pointer transition-colors ${
                 isActive
                   ? 'bg-velvety-green text-white'
@@ -148,9 +208,9 @@ export function CatalogPage() {
       {/* Search & Sort Toolbar */}
       <CatalogToolbar
         searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
+        onSearchChange={handleSearchInput}
         sortBy={sortBy}
-        onSortChange={setSortChange}
+        onSortChange={handleSortSelect}
         resultCount={sortedProducts.length}
       />
 
@@ -164,7 +224,7 @@ export function CatalogPage() {
           <p className="text-red-600">{error}</p>
           <button
             type="button"
-            onClick={loadProducts}
+            onClick={handleRetry}
             className="bg-velvety-green hover:bg-velvety-sage text-white text-xs uppercase tracking-wider font-medium px-6 py-2.5 cursor-pointer transition-colors"
           >
             Try again
@@ -188,7 +248,7 @@ export function CatalogPage() {
           {/* Bottom Pagination Bar + Showing X–Y of Z text (PRD P2.1 & P2.7) */}
           <div className="space-y-2 text-center">
             <Pagination
-              page={currentPage}
+              page={safePage}
               totalPages={totalPages}
               onChange={handlePageChange}
             />

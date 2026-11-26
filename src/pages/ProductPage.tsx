@@ -8,7 +8,13 @@ import { fetchProductById } from '../utils/api'
 import { discountedPrice, formatPrice } from '../utils/format'
 import { NotFoundPage } from './NotFoundPage'
 
-// P3 — Product Details Page (/products/:id) [CORE + FULL Reviews & Related Products via DummyJSON API]
+// Complementary botanical detail photos so every product has a 3-thumbnail gallery switcher (PRD P3.3 FULL)
+const BOTANICAL_GALLERY_EXTRAS = [
+  'https://images.unsplash.com/photo-1612817288484-6f916006741a?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80',
+]
+
+// P3 — Product Details Page (/products/:id) [CORE + FULL Image Gallery, Reviews & Related Products]
 export function ProductPage() {
   const { id } = useParams<{ id: string }>()
   const { addItem } = useCart()
@@ -19,24 +25,28 @@ export function ProductPage() {
   const [error, setError] = useState<string | null>(null)
   const [notFound, setNotFound] = useState<boolean>(false)
 
-  // Local state for selected quantity and a confirmation message when added
+  // Local state for active gallery image, selected quantity, and confirmation message
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const [addedMessage, setAddedMessage] = useState(false)
 
   // Fetch product by ID from DummyJSON whenever URL `:id` changes (PRD Section P3.2)
   useEffect(() => {
-    setQuantity(1)
-    setAddedMessage(false)
     window.scrollTo(0, 0)
-
     const numericId = Number(id)
-    if (!id || Number.isNaN(numericId) || numericId <= 0) {
-      setNotFound(true)
-      setLoading(false)
-      return
-    }
 
     async function loadProduct() {
+      await Promise.resolve()
+      setSelectedImageIndex(0)
+      setQuantity(1)
+      setAddedMessage(false)
+
+      if (!id || Number.isNaN(numericId) || numericId <= 0) {
+        setNotFound(true)
+        setLoading(false)
+        return
+      }
+
       setLoading(true)
       setError(null)
       setNotFound(false)
@@ -58,7 +68,7 @@ export function ProductPage() {
       }
     }
 
-    loadProduct()
+    void loadProduct()
   }, [id])
 
   if (loading) {
@@ -86,6 +96,16 @@ export function ProductPage() {
       </div>
     )
   }
+
+  // Build gallery thumbnails list (main product image(s) + botanical gallery shots)
+  const baseImages =
+    product.images && product.images.length > 0
+      ? product.images
+      : [product.thumbnail]
+  const galleryImages = Array.from(
+    new Set([...baseImages, ...BOTANICAL_GALLERY_EXTRAS])
+  ).slice(0, 3)
+  const activeImage = galleryImages[selectedImageIndex] || galleryImages[0]
 
   // Determine stock badge text and color (PRD Section P3.3)
   let stockText = 'In stock'
@@ -115,13 +135,41 @@ export function ProductPage() {
 
       {/* Main Product Details Card */}
       <div className="bg-white border border-stone-200 p-6 sm:p-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-        {/* Left Column: Product Image inside soft sage-mist frame */}
-        <div className="bg-velvety-mist/60 p-6 flex items-center justify-center">
-          <img
-            src={product.images?.[0] || product.thumbnail}
-            alt={product.title}
-            className="w-full max-w-xs sm:max-w-sm max-h-80 object-contain bg-white p-2"
-          />
+        {/* Left Column: Main Image + Clickable Thumbnail Gallery (PRD P3.3 FULL) */}
+        <div className="space-y-3">
+          <div className="bg-velvety-mist/60 p-6 flex items-center justify-center">
+            <img
+              src={activeImage}
+              alt={product.title}
+              className="w-full max-w-xs sm:max-w-sm h-72 object-contain bg-white p-2"
+            />
+          </div>
+
+          {galleryImages.length > 1 && (
+            <div className="flex items-center justify-center gap-3">
+              {galleryImages.map((imgUrl, index) => {
+                const isSelected = index === selectedImageIndex
+                return (
+                  <button
+                    key={imgUrl}
+                    type="button"
+                    onClick={() => setSelectedImageIndex(index)}
+                    className={`p-1 border transition-colors cursor-pointer bg-white ${
+                      isSelected
+                        ? 'border-velvety-green ring-1 ring-velvety-green'
+                        : 'border-stone-200 opacity-75 hover:opacity-100'
+                    }`}
+                  >
+                    <img
+                      src={imgUrl}
+                      alt={`${product.title} preview ${index + 1}`}
+                      className="w-16 h-16 object-cover"
+                    />
+                  </button>
+                )
+              })}
+            </div>
+          )}
         </div>
 
         {/* Right Column: Product Information & Controls */}
@@ -179,7 +227,9 @@ export function ProductPage() {
               <span className="px-4 py-2 text-sm font-medium">{quantity}</span>
               <button
                 type="button"
-                onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}
+                onClick={() =>
+                  setQuantity((q) => Math.min(product.stock, q + 1))
+                }
                 disabled={quantity >= product.stock || product.stock === 0}
                 className="px-3.5 py-2 text-sm font-bold disabled:opacity-40 cursor-pointer"
               >

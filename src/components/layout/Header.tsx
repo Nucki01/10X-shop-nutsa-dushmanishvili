@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
 import { useTheme } from '../../context/ThemeContext'
 
-// Shared Header Component (PRD P0.3 — 10X Shop logo, Catalog, Cart + badge hidden at 0, Theme toggle, Log in/Log out)
+// Shared Header Component (PRD P0.3 — 10X Shop logo, Catalog, Cart + badge hidden at 0, Orders, Profile, Theme toggle, Log in/Log out)
 export function Header() {
   const { user, logout } = useAuth()
   const { totalItems } = useCart()
@@ -62,6 +62,32 @@ export function Header() {
             )}
           </NavLink>
 
+          {/* Orders & Profile links (PRD FULL P6 & P7) */}
+          {user.isLoggedIn && (
+            <>
+              <NavLink
+                to="/orders"
+                className={({ isActive }) =>
+                  isActive
+                    ? 'text-white underline underline-offset-4 font-semibold'
+                    : 'text-white/80 hover:text-white transition-colors'
+                }
+              >
+                Orders
+              </NavLink>
+              <NavLink
+                to="/profile"
+                className={({ isActive }) =>
+                  isActive
+                    ? 'text-white underline underline-offset-4 font-semibold'
+                    : 'text-white/80 hover:text-white transition-colors'
+                }
+              >
+                Profile
+              </NavLink>
+            </>
+          )}
+
           {/* Dark / Light Mode Toggle Button (PRD Tailwind CSS FULL) */}
           <button
             type="button"
@@ -75,9 +101,12 @@ export function Header() {
           {/* Show Username + Log out if logged in, otherwise show Log in */}
           {user.isLoggedIn ? (
             <div className="flex items-center gap-3">
-              <span className="text-white/90 normal-case">
+              <Link
+                to="/profile"
+                className="text-white/90 hover:text-white normal-case"
+              >
                 Hi, {user.username}
-              </span>
+              </Link>
               <button
                 type="button"
                 onClick={handleLogout}
@@ -87,12 +116,20 @@ export function Header() {
               </button>
             </div>
           ) : (
-            <NavLink
-              to="/login"
-              className="bg-stone-100 text-stone-900 hover:bg-stone-200 px-3.5 py-1.5 rounded-xs text-xs font-semibold uppercase tracking-wider transition-colors"
-            >
-              Log in
-            </NavLink>
+            <div className="flex items-center gap-3">
+              <NavLink
+                to="/register"
+                className="border border-white/40 hover:bg-white/10 text-white px-3.5 py-1.5 rounded-xs text-xs font-semibold uppercase tracking-wider transition-colors"
+              >
+                Register
+              </NavLink>
+              <NavLink
+                to="/login"
+                className="bg-stone-100 text-stone-900 hover:bg-stone-200 px-3.5 py-1.5 rounded-xs text-xs font-semibold uppercase tracking-wider transition-colors"
+              >
+                Log in
+              </NavLink>
+            </div>
           )}
         </nav>
       </Container>
