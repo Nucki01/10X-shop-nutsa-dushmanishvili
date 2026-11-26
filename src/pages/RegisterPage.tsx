@@ -120,7 +120,7 @@ export function RegisterPage() {
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              placeholder="e.g. Nutsa Dushmanishvili"
+              placeholder="Enter your full name"
               className="w-full border border-stone-300 bg-velvety-cream/50 px-3.5 py-2.5 text-sm focus:outline-2 focus:outline-velvety-green"
             />
             {errors.fullName && (
@@ -162,7 +162,7 @@ export function RegisterPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="e.g. nutsa@example.com"
+              placeholder="name@example.com"
               className="w-full border border-stone-300 bg-velvety-cream/50 px-3.5 py-2.5 text-sm focus:outline-2 focus:outline-velvety-green"
             />
             {errors.email && (
