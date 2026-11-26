@@ -35,8 +35,11 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
-// Merge guest items into a user's saved cart when a guest logs in to complete checkout
-function mergeCartLists(savedItems: CartItem[], guestItems: CartItem[]): CartItem[] {
+// Merge guest items into a user's saved cart when a guest logs in
+function mergeCartLists(
+  savedItems: CartItem[],
+  guestItems: CartItem[]
+): CartItem[] {
   if (guestItems.length === 0) return savedItems
   const merged = [...savedItems]
 
@@ -48,7 +51,10 @@ function mergeCartLists(savedItems: CartItem[], guestItems: CartItem[]): CartIte
       const existing = merged[existingIndex]
       merged[existingIndex] = {
         ...existing,
-        quantity: Math.min(existing.quantity + guestItem.quantity, existing.stock),
+        quantity: Math.min(
+          existing.quantity + guestItem.quantity,
+          existing.stock
+        ),
       }
     } else {
       merged.push(guestItem)
@@ -66,9 +72,20 @@ function loadInitialCart(username: string, isLoggedIn: boolean): CartItem[] {
   return Array.isArray(guestSaved) ? guestSaved.filter(isValidCartItem) : []
 }
 
+// Save cart items to the active storage bucket (signed-in user's account vs guest)
+function persistCartForActiveUser(username: string, nextItems: CartItem[]) {
+  if (username) {
+    saveUserCart(username, nextItems)
+    StorageService.set<CartItem[]>('shop_cart', nextItems)
+  } else {
+    StorageService.set<CartItem[]>('shop_cart_guest', nextItems)
+    StorageService.set<CartItem[]>('shop_cart', nextItems)
+  }
+}
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth()
-  const activeUsername = user.isLoggedIn ? user.username : ''
+  const activeUsername = user.isLoggedIn ? user.username.trim().toLowerCase() : ''
 
   const [items, setItems] = useState<CartItem[]>(() =>
     loadInitialCart(user.username, user.isLoggedIn)
@@ -81,30 +98,28 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const prevUsername = prevUsernameRef.current
     if (prevUsername === activeUsername) return
-
     prevUsernameRef.current = activeUsername
 
     async function syncCartOnAuthChange() {
       await Promise.resolve()
       if (activeUsername) {
-        // User just logged in: load their saved personal cart and merge any items added while browsing as guest
+        // User just logged in: restore their saved account cart (`shop_cart_user_<username>`)
+        // and merge any items they added as a guest right before logging in.
         const savedUserItems = loadUserCart(activeUsername)
+        const guestRaw = StorageService.get<unknown[]>('shop_cart_guest', [])
         const guestItems =
-          prevUsername === ''
-            ? StorageService.get<unknown[]>('shop_cart_guest', []).filter(
-                isValidCartItem
-              )
+          prevUsername === '' && Array.isArray(guestRaw)
+            ? guestRaw.filter(isValidCartItem)
             : []
-        const merged = mergeCartLists(savedUserItems, guestItems)
 
-        // Clear guest cart so items are never left visible when logging out
+        const restoredItems = mergeCartLists(savedUserItems, guestItems)
         StorageService.remove('shop_cart_guest')
-        saveUserCart(activeUsername, merged)
-        StorageService.set<CartItem[]>('shop_cart', merged)
-        setItems(merged)
+        saveUserCart(activeUsername, restoredItems)
+        StorageService.set<CartItem[]>('shop_cart', restoredItems)
+        setItems(restoredItems)
       } else {
-        // User just logged out: keep their personal cart saved in `shop_cart_user_<username>`,
-        // and reset the visible guest cart to empty so their items are NOT visible as guest.
+        // User just logged out: keep their account cart untouched in `shop_cart_user_<username>`,
+        // and clear the visible guest cart so their items are hidden while logged out.
         StorageService.remove('shop_cart_guest')
         StorageService.set<CartItem[]>('shop_cart', [])
         setItems([])
@@ -115,29 +130,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
     void syncCartOnAuthChange()
   }, [activeUsername])
 
-  // Persist cart items whenever `items` changes
-  useEffect(() => {
-    // Skip overwriting if an auth transition is currently pending
-    if (prevUsernameRef.current !== activeUsername) return
-
-    if (activeUsername) {
-      saveUserCart(activeUsername, items)
-      StorageService.set<CartItem[]>('shop_cart', items)
-    } else {
-      StorageService.set<CartItem[]>('shop_cart_guest', items)
-      StorageService.set<CartItem[]>('shop_cart', items)
-    }
-  }, [items, activeUsername])
-
-  // 1. Add a product to the cart (using immutable state updates)
+  // 1. Add a product to the cart (using immutable state updates + immediate account save)
   function addItem(product: Product, quantity = 1) {
     setItems((prevItems) => {
       const existingItem = prevItems.find(
         (item) => item.productId === product.id
       )
 
+      let nextItems: CartItem[]
       if (existingItem) {
-        return prevItems.map((item) =>
+        nextItems = prevItems.map((item) =>
           item.productId === product.id
             ? {
                 ...item,
@@ -145,37 +147,44 @@ export function CartProvider({ children }: { children: ReactNode }) {
               }
             : item
         )
+      } else {
+        const newItem: CartItem = {
+          productId: product.id,
+          title: product.title,
+          thumbnail: product.thumbnail,
+          price: product.price,
+          discountPercentage: product.discountPercentage,
+          stock: product.stock,
+          quantity: Math.min(quantity, product.stock),
+        }
+        nextItems = [...prevItems, newItem]
       }
 
-      const newItem: CartItem = {
-        productId: product.id,
-        title: product.title,
-        thumbnail: product.thumbnail,
-        price: product.price,
-        discountPercentage: product.discountPercentage,
-        stock: product.stock,
-        quantity: Math.min(quantity, product.stock),
-      }
-      return [...prevItems, newItem]
+      persistCartForActiveUser(activeUsername, nextItems)
+      return nextItems
     })
   }
 
   // 2. Remove a product from the cart using .filter()
   function removeItem(productId: number) {
-    setItems((prevItems) =>
-      prevItems.filter((item) => item.productId !== productId)
-    )
+    setItems((prevItems) => {
+      const nextItems = prevItems.filter((item) => item.productId !== productId)
+      persistCartForActiveUser(activeUsername, nextItems)
+      return nextItems
+    })
   }
 
   // 3. Change the quantity of a product (between 1 and stock) using .map()
   function updateQuantity(productId: number, quantity: number) {
-    setItems((prevItems) =>
-      prevItems.map((item) => {
+    setItems((prevItems) => {
+      const nextItems = prevItems.map((item) => {
         if (item.productId !== productId) return item
         const safeQty = Math.max(1, Math.min(quantity, item.stock))
         return { ...item, quantity: safeQty }
       })
-    )
+      persistCartForActiveUser(activeUsername, nextItems)
+      return nextItems
+    })
   }
 
   // 4. Apply promo code "10X10" (case-insensitive) for a 10% discount [FULL]
@@ -194,6 +203,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // 6. Empty the entire cart (used on Cart page and after Checkout)
   function clearCart() {
+    persistCartForActiveUser(activeUsername, [])
     setItems([])
     setPromoCode(null)
   }
